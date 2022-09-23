@@ -1,6 +1,7 @@
 package com.mcs.emkn.core
 
 import androidx.navigation.NavController
+import com.mcs.emkn.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
