@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="boxStrokeColor"> @color/sunset </item>
-        <item name="boxStrokeWidth"> 4dp </item>
+        <item name="boxStrokeColor">@color/sunset</item>
+        <item name="boxStrokeWidth">4dp</item>
     </style>
 
     <style name="AuthButtonsStyle" parent="Widget.MaterialComponents.Button">
@@ -12,6 +13,31 @@
     <style name="ShapeAppearanceOverlay.MyApp.Button.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="AuthConfirmButton">
+        <item name="android:paddingVertical">5dp</item>
+        <item name="android:background">@drawable/auth_confirm_background</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:textColor">@color/text_reversed</item>
+        <item name="android:minWidth">220dp</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <style name="AuthDeclineButton">
+        <item name="android:paddingVertical">5dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:background">@drawable/auth_decline_background</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:minWidth">160dp</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <style name="FixedSizeTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">16dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/inter</item>
     </style>
 
 

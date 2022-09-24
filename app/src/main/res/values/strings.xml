@@ -1,20 +1,23 @@
 <resources>
     <string name="app_name">emkn</string>
-    <string name="sign_up_button_text">Регистрация</string>
-    <string name="sign_in_button_text">Вход</string>
+    <string name="sign_up_button_text">Зарегистрироваться</string>
+    <string name="sign_up_tab_text">Регистрация</string>
+    <string name="sign_in_button_text">Войти</string>
     <string name="sign_in_email_text_layout_hint">Логин</string>
     <string name="sign_in_password_text_layout_hint">Пароль</string>
     <string name="sign_up_firstname_text_layout_hint">Имя</string>
     <string name="sign_up_lastname_text_layout_hint">Фамилия</string>
     <string name="sign_up_login_text_layout_hint">Логин</string>
     <string name="sign_up_email_text_layout_hint">Email</string>
-    <string name="email_confirmation_header">Введите код подтверждения\n отправленный на почту</string>
+    <string name="forgot_password_hint">Логин/Email</string>
+    <string name="email_confirmation_header">Введите код подтверждения, отправленный на почту</string>
     <string name="submit_code">Отправить код</string>
     <string name="send_code_again">Получить код повторно</string>
     <string name="send_code_again_in">Получить код повторно можно будет через: %d</string>
     <string name="forgot_password_button_text">Забыли пароль?</string>
     <string name="email_confirmation_head_text">Подтверждение почты</string>
     <string name="forgot_password_head_text">Восстановление пароля</string>
-    <string name="forgot_password_header">Вам на почту будет отправлен\nкод подтверждения</string>
+    <string name="forgot_password_header">Вам на почту будет отправлен код подтверждения</string>
     <string name="get_code__button_text">Получить код</string>
+    <string name="emkn_logo">emkn</string>
 </resources>
