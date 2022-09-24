@@ -5,6 +5,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class ResponseEmptyDto(
-    @Json(name = "errors") val errors: List<NetError>
-)
+data class ResponseEmptyDto (
+    @Json(name = "errors") override val errors: List<NetError>
+) : AuthResponseDto

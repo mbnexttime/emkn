@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-
+    android:layout_height="match_parent">
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -48,16 +45,12 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signInButton"
-        style="@style/AuthButtonsStyle"
-        android:layout_width="0dp"
+        style="@style/AuthConfirmButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="48dp"
-        android:backgroundTint="@color/teal_200"
+        android:layout_marginTop="56dp"
         android:text="@string/sign_in_button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,13 +82,12 @@
         app:layout_constraintStart_toStartOf="@id/passwordTextInputLayout"
         app:layout_constraintTop_toBottomOf="@id/passwordTextInputLayout" />
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/forgot_password_button"
-        style="@style/AuthButtonsStyle"
-        android:backgroundTint="@color/sunset"
+        style="@style/AuthDeclineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:text="@string/forgot_password_button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.mcs.emkn"
-        minSdk 26
+        minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -77,6 +77,4 @@ dependencies {
 
     // To use Kotlin annotation processing tool (kapt)
     kapt "androidx.room:room-compiler:$room_version"
-
-    implementation 'com.android.databinding:viewbinding:4.0.1'
 }

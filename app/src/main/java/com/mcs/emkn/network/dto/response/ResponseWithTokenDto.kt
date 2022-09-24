@@ -8,5 +8,5 @@ import com.squareup.moshi.JsonClass
 data class ResponseWithTokenDto(
     @Json(name = "random_token") val randomToken: String,
     @Json(name = "expires_at") val expiresAt: String,
-    @Json(name = "errors") val errors: List<NetError>
-)
+    @Json(name = "errors") override val errors: List<NetError>
+) : AuthResponseDto

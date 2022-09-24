@@ -17,6 +17,8 @@ class AuthFragment : Fragment() {
 
     private lateinit var binding: FragmentAuthBinding
 
+    private val titlesRes = listOf(R.string.sign_in_button_text, R.string.sign_up_tab_text)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentAuthBinding.inflate(inflater, container, false)
         return binding.root
@@ -30,15 +32,16 @@ class AuthFragment : Fragment() {
 
     private fun setupViewPager() {
         binding.authViewPager.adapter = activity?.let { AuthPagerAdapter(it) }
+        binding.authViewPager.offscreenPageLimit = titlesRes.size
     }
 
     private fun setupTabLayout() {
-        val titles = listOf(
-            resources.getString(R.string.sign_in_button_text),
-            resources.getString(R.string.sign_up_button_text)
-        )
         TabLayoutMediator(binding.authTabLayout, binding.authViewPager) { tab, position ->
-            tab.text = titles[position]
+            tab.text = resources.getString(titlesRes[position])
         }.attach()
+    }
+
+    companion object {
+
     }
 }

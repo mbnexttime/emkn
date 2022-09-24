@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <ImageButton
         android:id="@+id/backButton"
@@ -17,99 +15,103 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/email_confirmation_image_view"
+    <TextView
+        android:id="@+id/password_forgot_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/emkn_logo"
+        android:layout_marginTop="@dimen/emkn_logo_top_margin"
+        android:font="@font/inter"
+        android:gravity="center"
+        android:lineHeight="77dp"
+        android:text="@string/emkn_logo"
+        android:textColor="@color/confirm_50"
+        android:textSize="64dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/backButton" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/password_forgot_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/auth_screen_horizontal_margin"
+        android:layout_marginTop="54dp"
+        android:text="@string/email_confirmation_head_text"
+        android:textColor="@color/text"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_forgot_title" />
 
+    <View
+        android:id="@+id/password_forgot_header_underline"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/accent"
+        app:layout_constraintEnd_toEndOf="@id/password_forgot_header"
+        app:layout_constraintStart_toStartOf="@id/password_forgot_header"
+        app:layout_constraintTop_toBottomOf="@id/password_forgot_header" />
 
+    <TextView
+        android:id="@+id/password_forgot_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        android:gravity="start"
+        android:paddingHorizontal="@dimen/auth_screen_horizontal_margin"
+        android:text="@string/email_confirmation_header"
+        android:textColor="@color/confirm"
+        android:textSize="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_forgot_header_underline" />
 
     <com.mcs.emkn.ui.emailconfirmation.VerificationCodeEditText
         android:id="@+id/codeEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="21dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="337dp" />
+        app:layout_constraintTop_toBottomOf="@id/password_forgot_description" />
 
-    <TextView
-        android:id="@+id/email_confirmation_text_view"
-        style="@style/TextAppearance.MaterialComponents.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="36dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:gravity="center_horizontal"
-        android:text="@string/email_confirmation_header"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tab_layout_email_confirmation" />
-
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sendCodeButton"
-        style="@style/AuthButtonsStyle"
+        style="@style/AuthConfirmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="96dp"
+        android:layout_marginTop="56dp"
         android:text="@string/submit_code"
-        android:backgroundTint="@color/teal_200"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/SendCodeAgainTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="173dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="180dp"
-        android:text="@string/send_code_again"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/codeEditText" />
+        app:layout_constraintTop_toBottomOf="@id/codeEditText" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/sendCodeAgainButton"
+        style="@style/AuthDeclineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="@string/send_code_again"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sendCodeButton" />
 
     <TextView
         android:id="@+id/timerTextVIew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="177dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="176dp"
+        android:layout_marginTop="36dp"
+        android:gravity="start"
+        android:paddingHorizontal="@dimen/auth_screen_horizontal_margin"
         android:text="@string/send_code_again_in"
-        android:textColor="@color/gray"
+        android:textColor="@color/text_50"
+        android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/SendCodeAgainTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/sendCodeButton" />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_email_confirmation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="1dp"
-
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/email_confirmation_image_view">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="36dp"
-            android:text="@string/email_confirmation_head_text" />
-
-    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
