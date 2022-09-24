@@ -1,13 +1,27 @@
 package com.mcs.emkn.network
 
-import com.mcs.emkn.network.dto.RegistrationResponseDto
+import com.mcs.emkn.network.dto.request.LoginRequestDto
+import com.mcs.emkn.network.dto.request.RegistrationRequestDto
+import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
+import com.mcs.emkn.network.dto.response.ResponseEmptyDto
+import com.mcs.emkn.network.dto.response.ResponseWithTokenDto
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 interface Api {
+    @POST("accounts/register")
     fun accountsRegister(
-        login: String,
-        password: String,
-        email: String,
-        firstName: String,
-        lastName: String,
-    ): RegistrationResponseDto
+        @Body request: RegistrationRequestDto
+    ): Call<ResponseWithTokenDto>
+
+    @POST("accounts/validate_email")
+    fun validateEmail(
+        @Body request: ValidateEmailRequestDto
+    ): Call<ResponseEmptyDto>
+
+    @POST("accounts/login")
+    fun accountsLogin(
+        @Body request: LoginRequestDto
+    ): Call<ResponseEmptyDto>
 }
