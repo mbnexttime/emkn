@@ -2,11 +2,11 @@ package com.mcs.emkn.network
 
 import com.mcs.emkn.network.dto.request.*
 import com.mcs.emkn.network.dto.response.ResponseEmptyDto
+import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenDto
-import retrofit2.Call
 
 class MockApi: Api {
-    override suspend fun accountsRegister(request: RegistrationRequestDto): AuthResponse<ResponseWithTokenDto> {
+    override suspend fun accountsRegister(request: RegistrationRequestDto): AuthResponse<ResponseWithTokenAndTimeDto> {
         TODO("Not yet implemented")
     }
 
@@ -18,11 +18,15 @@ class MockApi: Api {
         TODO("Not yet implemented")
     }
 
-    override suspend fun accountsChangePassword(request: ChangePasswordRequestDto): AuthResponse<ResponseWithTokenDto> {
+    override suspend fun accountsChangePassword(request: ChangePasswordRequestDto): AuthResponse<ResponseWithTokenAndTimeDto> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun accountsValidateChangePassword(request: ValidateChangePasswordRequestDto): AuthResponse<ResponseEmptyDto> {
+    override suspend fun accountsValidateChangePassword(request: ValidateChangePasswordRequestDto): AuthResponse<ResponseWithTokenDto> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun accountsCommitChangePassword(request: CommitChangePasswordRequestDto): AuthResponse<ResponseEmptyDto> {
         TODO("Not yet implemented")
     }
 }
