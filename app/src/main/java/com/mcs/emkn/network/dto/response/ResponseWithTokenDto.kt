@@ -7,5 +7,4 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class ResponseWithTokenDto(
     @Json(name = "change_password_token") val randomToken: String,
-    @Json(name = "errors") override val errors: List<NetError>
-) : AuthResponseDto
+)
