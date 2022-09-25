@@ -2,7 +2,7 @@
 <resources>
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="boxStrokeColor">@color/sunset</item>
+        <item name="boxStrokeColor">@color/accent</item>
         <item name="boxStrokeWidth">4dp</item>
     </style>
 
