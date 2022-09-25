@@ -86,6 +86,9 @@ class VerificationCodeEditText @JvmOverloads constructor(
     fun isFilled(): Boolean =
         slotValues.isFilled()
 
+    fun isBlank(): Boolean =
+        slotValues.isBlank()
+
     private fun List<VerificationCodeSlotView>.render(values: Array<CharSequence?>) {
         values.forEachIndexed { index, value ->
             val slotView = this[index]
@@ -122,6 +125,12 @@ class VerificationCodeEditText @JvmOverloads constructor(
     private fun Array<CharSequence?>.isFilled(): Boolean =
         all { it != null }
 
+    private fun Array<CharSequence?>.isBlank(): Boolean =
+        all { it == null }
+
+
     private fun Array<CharSequence?>.toCodeString(): String =
         joinToString(separator = "", prefix = "", postfix = "", limit = -1, truncated = "") { it ?: "" }
 }
+
+

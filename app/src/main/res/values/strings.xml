@@ -20,4 +20,11 @@
     <string name="forgot_password_header">Вам на почту будет отправлен код подтверждения</string>
     <string name="get_code__button_text">Получить код</string>
     <string name="emkn_logo">emkn</string>
+    <string name="change_password_confirmation_header">Восстановление пароля</string>
+    <string name="commit_change_password_description">Введите новый пароль</string>
+    <string name="commit_change_password_submit_button">Изменить пароль</string>
+    <string name="commit_change_password_hint_text">Пароль</string>
+    <string name="sign_in_back_alert_dialog_text">Введенные данные не сохранятся.</string>
+    <string name="sign_in_back_alert_dialog_cancel_button_text">Отмена</string>
+    <string name="sign_in_back_alert_dialog_ok_button_text">Ок</string>
 </resources>

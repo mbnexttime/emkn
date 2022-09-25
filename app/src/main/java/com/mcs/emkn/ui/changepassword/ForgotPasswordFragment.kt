@@ -1,54 +1,69 @@
-package com.mcs.emkn.ui.emailconfirmation
+package com.mcs.emkn.ui.changepassword
 
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.mcs.emkn.R
 import com.mcs.emkn.core.RouterImpl
-import com.mcs.emkn.databinding.FragmentConfirmationBinding
+import com.mcs.emkn.databinding.FragmentForgotPasswordBinding
 import com.mcs.emkn.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EmailConfirmationFragment : Fragment() {
-    private lateinit var binding: FragmentConfirmationBinding
+class ForgotPasswordFragment : Fragment() {
+    private lateinit var binding : FragmentForgotPasswordBinding
+
     @Inject
     lateinit var router: RouterImpl
-    private var verificationCode: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentConfirmationBinding.inflate(inflater, container, false)
+        binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.submitButton.setOnClickListener {
+            router.goToChangePasswordConfirmationScreen()
+        }
         binding.backButton.setOnClickListener {
             onBackButtonPressed()
         }
-        setupCodeEditField()
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            onBackButtonPressed()
+            this.isEnabled = true
+        }
+        subscribeToFormFields()
     }
 
-    private fun setupCodeEditField() {
-        binding.sendCodeButton.isEnabled = false
-        binding.codeEditText.onVerificationCodeFilledChangeListener = { isFilled ->
-            binding.sendCodeButton.isEnabled = isFilled
-        }
-        binding.codeEditText.onVerificationCodeFilledListener = { code ->
-            verificationCode = code
+    private fun decideSignInButtonEnabledState(email: String?) {
+        binding.submitButton.isEnabled = !email.isNullOrBlank()
+    }
+    private fun subscribeToFormFields() {
+        decideSignInButtonEnabledState(
+            email = binding.emailEditText.text?.toString(),
+        )
+        binding.emailEditText.doAfterTextChanged { email ->
+            decideSignInButtonEnabledState(
+                email = email?.toString(),
+            )
         }
     }
 
     private fun onBackButtonPressed() {
-        if (binding.codeEditText.isBlank()) {
+        val email = binding.emailEditText.text?.toString()
+        if (email.isNullOrBlank()) {
             router.back()
             return
         }

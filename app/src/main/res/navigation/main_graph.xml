@@ -20,6 +20,22 @@
         android:label="EmailConfirmationFragment" />
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.mcs.emkn.ui.auth.ForgotPasswordFragment"
-        android:label="ForgotPasswordFragment" />
+        android:name="com.mcs.emkn.ui.changepassword.ForgotPasswordFragment"
+        android:label="ForgotPasswordFragment" >
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_changePasswordConfirmationFragment"
+            app:destination="@id/changePasswordConfirmationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/changePasswordConfirmationFragment"
+        android:name="com.mcs.emkn.ui.changepassword.ChangePasswordConfirmationFragment"
+        android:label="ChangePasswordConfirmationFragment" >
+        <action
+            android:id="@+id/action_changePasswordConfirmationFragment_to_commitChangePasswordFragment"
+            app:destination="@id/commitChangePasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/commitChangePasswordFragment"
+        android:name="com.mcs.emkn.ui.changepassword.CommitChangePasswordFragment"
+        android:label="CommitChangePasswordFragment" />
 </navigation>
