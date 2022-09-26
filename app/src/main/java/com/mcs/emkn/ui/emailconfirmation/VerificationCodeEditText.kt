@@ -36,7 +36,7 @@ class VerificationCodeEditText @JvmOverloads constructor(
 
     var onVerificationCodeFilledListener: (String) -> Unit = {}
 
-    var onVerificationCodeFilledChangeListener: (Boolean) -> Unit = {}
+    var onVerificationCodeChangeListener: (Boolean) -> Unit = {}
 
     init {
         viewBinding.realVerificationCodeEditText.addTextChangedListener(
@@ -56,7 +56,7 @@ class VerificationCodeEditText @JvmOverloads constructor(
                     slotViews.render(slotValues)
                     slotViews.moveCursorToFirstEmptySlot(slotValues)
                     val filled = slotValues.isFilled()
-                    onVerificationCodeFilledChangeListener(filled)
+                    onVerificationCodeChangeListener(filled)
                     if (filled) onVerificationCodeFilledListener(slotValues.toCodeString())
                     // Uncomment if we need to clear the whole field on backspace.
                     // if (wasClearedLastSlot) viewBinding.realVerificationCodeEditText.setText("")

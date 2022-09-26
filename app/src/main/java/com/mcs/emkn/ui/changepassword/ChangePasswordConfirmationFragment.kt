@@ -6,19 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.mcs.emkn.R
-import com.mcs.emkn.core.RouterImpl
+import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentConfirmationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChangePasswordConfirmationFragment : Fragment() {
-    private lateinit var binding : FragmentConfirmationBinding
+    private var _binding : FragmentConfirmationBinding? = null
+    private val binding get() = _binding!!
 
     @Inject
-    lateinit var router: RouterImpl
+    lateinit var router: Router
 
     private var verificationCode: String? = null
 
@@ -27,13 +27,18 @@ class ChangePasswordConfirmationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentConfirmationBinding.inflate(inflater, container, false)
-        setupLayout()
+        _binding = FragmentConfirmationBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupLayout()
         binding.sendCodeButton.setOnClickListener {
             router.goToCommitChangePasswordScreen()
         }
@@ -49,7 +54,7 @@ class ChangePasswordConfirmationFragment : Fragment() {
 
     private fun setupCodeEditField() {
         binding.sendCodeButton.isEnabled = false
-        binding.codeEditText.onVerificationCodeFilledChangeListener = { isFilled ->
+        binding.codeEditText.onVerificationCodeChangeListener = { isFilled ->
             binding.sendCodeButton.isEnabled = isFilled
         }
         binding.codeEditText.onVerificationCodeFilledListener = { code ->

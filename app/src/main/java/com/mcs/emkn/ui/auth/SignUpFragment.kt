@@ -8,29 +8,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.mcs.emkn.R
-import com.mcs.emkn.core.RouterImpl
+import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
-    private lateinit var binding: FragmentSignUpBinding
-
+    private var _binding: FragmentSignUpBinding? = null
+    private val binding get() = _binding!!
     @Inject
-    lateinit var router: RouterImpl
+    lateinit var router: Router
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        _binding = FragmentSignUpBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

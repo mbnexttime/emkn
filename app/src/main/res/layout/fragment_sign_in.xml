@@ -6,7 +6,7 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailTextInputLayout"
+        android:id="@+id/loginTextInputLayout"
         style="@style/TextInputLayoutStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/emailEditText"
+            android:id="@+id/loginEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -35,7 +35,7 @@
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailTextInputLayout">
+        app:layout_constraintTop_toBottomOf="@+id/loginTextInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordEditText"
@@ -65,9 +65,9 @@
         android:text=""
         android:textColor="@color/red"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@id/emailTextInputLayout"
-        app:layout_constraintStart_toStartOf="@id/emailTextInputLayout"
-        app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout" />
+        app:layout_constraintEnd_toEndOf="@id/loginTextInputLayout"
+        app:layout_constraintStart_toStartOf="@id/loginTextInputLayout"
+        app:layout_constraintTop_toBottomOf="@id/loginTextInputLayout" />
 
     <TextView
         android:id="@+id/underPasswordTextView"

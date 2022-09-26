@@ -9,31 +9,36 @@ import androidx.activity.addCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.mcs.emkn.R
-import com.mcs.emkn.core.RouterImpl
+import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentForgotPasswordBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.math.round
 
 @AndroidEntryPoint
 class CommitChangePasswordFragment : Fragment() {
-    private lateinit var binding : FragmentForgotPasswordBinding
+    private var _binding : FragmentForgotPasswordBinding? = null
+    private val binding get() = _binding!!
 
     @Inject
-    lateinit var router: RouterImpl
+    lateinit var router: Router
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
-        setupLayout()
+        _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupLayout()
         binding.backButton.setOnClickListener {
             onBackButtonPressed()
         }
@@ -47,26 +52,27 @@ class CommitChangePasswordFragment : Fragment() {
     private fun setupLayout() {
         binding.passwordForgotDescription.text = resources.getString(R.string.commit_change_password_description)
         binding.submitButton.text = resources.getString(R.string.commit_change_password_submit_button)
-        binding.emailTextInputLayout.hint = resources.getString(R.string.commit_change_password_hint_text)
+        binding.textInputLayout.hint = resources.getString(R.string.commit_change_password_hint_text)
     }
 
-    private fun decideSignInButtonEnabledState(email: String?) {
-        binding.submitButton.isEnabled = !email.isNullOrBlank()
+    private fun decideSignInButtonEnabledState(password: String?) {
+        binding.submitButton.isEnabled = !password.isNullOrBlank()
     }
+
     private fun subscribeToFormFields() {
         decideSignInButtonEnabledState(
-            email = binding.emailEditText.text?.toString(),
+            password = binding.editText.text?.toString(),
         )
-        binding.emailEditText.doAfterTextChanged { email ->
+        binding.editText.doAfterTextChanged { password ->
             decideSignInButtonEnabledState(
-                email = email?.toString(),
+                password = password?.toString(),
             )
         }
     }
 
     private fun onBackButtonPressed() {
-        val email = binding.emailEditText.text?.toString()
-        if (email.isNullOrBlank()) {
+        val password = binding.editText.text?.toString()
+        if (password.isNullOrBlank()) {
             router.back()
             return
         }

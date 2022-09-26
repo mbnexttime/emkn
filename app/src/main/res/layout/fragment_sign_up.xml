@@ -135,8 +135,8 @@
             android:textColor="@color/red"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/emailTextInputLayout"
-            app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout" />
+            app:layout_constraintStart_toStartOf="@id/loginTextInputLayout"
+            app:layout_constraintTop_toBottomOf="@id/loginTextInputLayout" />
 
         <TextView
             android:id="@+id/underPasswordTextView"

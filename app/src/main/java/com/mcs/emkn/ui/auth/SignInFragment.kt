@@ -8,27 +8,32 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.mcs.emkn.R
-import com.mcs.emkn.core.RouterImpl
+import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignInBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignInFragment : Fragment() {
-    private lateinit var binding: FragmentSignInBinding
+    private var _binding: FragmentSignInBinding? = null
+    private val binding get() = _binding!!
 
     @Inject
-    lateinit var router: RouterImpl
+    lateinit var router: Router
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSignInBinding.inflate(inflater, container, false)
+        _binding = FragmentSignInBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,32 +48,33 @@ class SignInFragment : Fragment() {
         }
     }
 
-    private fun decideSignInButtonEnabledState(email: String?, password: String?) {
-        binding.submitButton.isEnabled = !(email.isNullOrBlank() || password.isNullOrBlank())
+    private fun decideSignInButtonEnabledState(login: String?, password: String?) {
+        binding.submitButton.isEnabled = !(login.isNullOrBlank() || password.isNullOrBlank())
     }
+
     private fun subscribeToFormFields() {
         decideSignInButtonEnabledState(
-            email = binding.emailEditText.text?.toString(),
+            login = binding.loginEditText.text?.toString(),
             password = binding.passwordEditText.text?.toString()
         )
-        binding.emailEditText.doAfterTextChanged { email ->
+        binding.loginEditText.doAfterTextChanged { login ->
             decideSignInButtonEnabledState(
-                email = email?.toString(),
+                login = login?.toString(),
                 password = binding.passwordEditText.text?.toString()
             )
         }
         binding.passwordEditText.doAfterTextChanged { password ->
             decideSignInButtonEnabledState(
-                email = binding.emailEditText.text?.toString(),
+                login = binding.loginEditText.text?.toString(),
                 password = password?.toString()
             )
         }
     }
 
     private fun onBackButtonPressed() {
-        val email = binding.emailEditText.text?.toString()
+        val login = binding.loginEditText.text?.toString()
         val password = binding.passwordEditText.text?.toString()
-        if (email.isNullOrBlank() && password.isNullOrBlank()) {
+        if (login.isNullOrBlank() && password.isNullOrBlank()) {
             router.back()
             return
         }
