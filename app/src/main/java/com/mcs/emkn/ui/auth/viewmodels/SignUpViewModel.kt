@@ -32,6 +32,10 @@ class SignUpViewModel @Inject constructor(
     private val _navEvents = MutableSharedFlow<SignUpNavEvent>()
     private val isLoadingAtomic = observer.isLoading
 
+    init {
+        isLoadingAtomic.set(false)
+    }
+
     override fun onSignUpClick(email: String, login: String, password: String, name: String, surname: String) {
         if (isLoadingAtomic.get()) {
             return

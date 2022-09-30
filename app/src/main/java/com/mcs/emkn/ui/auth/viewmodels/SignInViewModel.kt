@@ -33,6 +33,10 @@ class SignInViewModel @Inject constructor(
     private val _errorsFlow = MutableSharedFlow<SignInError>()
     private val isLoadingAtomic = observer.isLoading
 
+    init {
+        isLoadingAtomic.set(false)
+    }
+
     override fun onSignInClick(login: String, password: String) {
         if (isLoadingAtomic.get()) {
             return
