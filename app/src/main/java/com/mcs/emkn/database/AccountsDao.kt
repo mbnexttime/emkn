@@ -5,6 +5,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.OnConflictStrategy.ABORT
 import androidx.room.Query
+import com.mcs.emkn.database.entities.ChangePasswordAttempt
+import com.mcs.emkn.database.entities.ChangePasswordAttempt.Companion.CHANGE_PASSWORD_ATTEMPT_TABLE_NAME
+import com.mcs.emkn.database.entities.ChangePasswordCommit
+import com.mcs.emkn.database.entities.ChangePasswordCommit.Companion.CHANGE_PASSWORD_COMMIT_TABLE_NAME
 import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.database.entities.Credentials.Companion.CREDENTIALS_TABLE_NAME
 import com.mcs.emkn.database.entities.SignUpAttempt
@@ -26,4 +30,22 @@ interface AccountsDao {
 
     @Insert(onConflict = ABORT)
     fun putSignUpAttempt(signUpAttempt: SignUpAttempt)
+
+    @Insert(onConflict = ABORT)
+    fun putChangePasswordAttempt(changePasswordAttempt: ChangePasswordAttempt)
+
+    @Query("SELECT * FROM $CHANGE_PASSWORD_ATTEMPT_TABLE_NAME")
+    fun getChangePasswordAttempts(): List<ChangePasswordAttempt>
+
+    @Query("DELETE * FROM $CHANGE_PASSWORD_ATTEMPT_TABLE_NAME")
+    fun deleteChangePasswordAttempts()
+
+    @Insert(onConflict = ABORT)
+    fun putChangePasswordCommit(changePasswordCommit: ChangePasswordCommit)
+    
+    @Query("SELECT * FROM $CHANGE_PASSWORD_COMMIT_TABLE_NAME")
+    fun getChangePasswordCommits(): List<ChangePasswordCommit>
+
+    @Query("DELETE * FROM $CHANGE_PASSWORD_COMMIT_TABLE_NAME")
+    fun deleteChangePasswordCommits()
 }

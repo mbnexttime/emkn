@@ -32,10 +32,6 @@ class SignUpViewModel @Inject constructor(
     private val _navEvents = MutableSharedFlow<SignUpNavEvent>()
     private val isLoadingAtomic = observer.isLoading
 
-    init {
-        isLoadingAtomic.set(false)
-    }
-
     override fun onSignUpClick(email: String, login: String, password: String, name: String, surname: String) {
         if (isLoadingAtomic.get()) {
             return
@@ -44,50 +40,53 @@ class SignUpViewModel @Inject constructor(
             if (!isLoadingAtomic.compareAndSet(false, true)) {
                 return@launch
             }
-            val response = api.accountsRegister(
-                RegistrationRequestDto(
-                    login = login,
-                    password = password,
-                    email = email,
-                    firstName = name,
-                    lastName = surname
-                )
-            )
-            when (response) {
-                is NetworkResponse.Success -> {
-                    database.accountsDao().deleteSignUpAttempts()
-                    database.accountsDao().putSignUpAttempt(
-                        SignUpAttempt(
-                            email = email,
-                            login = login,
-                            password = password,
-                            name = name,
-                            surName = surname,
-                            randomToken = response.body.randomToken,
-                            expiresIn = response.body.expiresIn,
-                            createdAt = System.currentTimeMillis(),
-                        )
+            try {
+                val response = api.accountsRegister(
+                    RegistrationRequestDto(
+                        login = login,
+                        password = password,
+                        email = email,
+                        firstName = name,
+                        lastName = surname
                     )
-                    _navEvents.emit(SignUpNavEvent.ContinueSignUp)
-                }
-                is NetworkResponse.ServerError -> {
-                    val errorsBody = response.body
-                    if (errorsBody != null) {
-                        if (errorsBody.errors.illegalLogin != null) {
-                            _errorsFlow.emit(SignUpError.IllegalLogin)
-                        }
-                        if (errorsBody.errors.illegalPassword != null) {
-                            _errorsFlow.emit(SignUpError.IllegalPassword)
-                        }
-                        if (errorsBody.errors.loginIsNotAvailable != null) {
-                            _errorsFlow.emit(SignUpError.LoginIsNotAvailable)
+                )
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        database.accountsDao().deleteSignUpAttempts()
+                        database.accountsDao().putSignUpAttempt(
+                            SignUpAttempt(
+                                email = email,
+                                login = login,
+                                password = password,
+                                name = name,
+                                surName = surname,
+                                randomToken = response.body.randomToken,
+                                expiresIn = response.body.expiresIn,
+                                createdAt = System.currentTimeMillis(),
+                            )
+                        )
+                        _navEvents.emit(SignUpNavEvent.ContinueSignUp)
+                    }
+                    is NetworkResponse.ServerError -> {
+                        val errorsBody = response.body
+                        if (errorsBody != null) {
+                            if (errorsBody.errors.illegalLogin != null) {
+                                _errorsFlow.emit(SignUpError.IllegalLogin)
+                            }
+                            if (errorsBody.errors.illegalPassword != null) {
+                                _errorsFlow.emit(SignUpError.IllegalPassword)
+                            }
+                            if (errorsBody.errors.loginIsNotAvailable != null) {
+                                _errorsFlow.emit(SignUpError.LoginIsNotAvailable)
+                            }
                         }
                     }
+                    is NetworkResponse.NetworkError -> _errorsFlow.emit(SignUpError.BadNetwork)
+                    is NetworkResponse.UnknownError -> Unit
                 }
-                is NetworkResponse.NetworkError -> _errorsFlow.emit(SignUpError.BadNetwork)
-                is NetworkResponse.UnknownError -> throw RuntimeException()
+            } finally {
+                isLoadingAtomic.compareAndSet(false, true)
             }
-            isLoadingAtomic.compareAndSet(false, true)
         }
     }
 }

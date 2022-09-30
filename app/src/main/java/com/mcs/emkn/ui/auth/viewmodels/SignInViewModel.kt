@@ -33,10 +33,6 @@ class SignInViewModel @Inject constructor(
     private val _errorsFlow = MutableSharedFlow<SignInError>()
     private val isLoadingAtomic = observer.isLoading
 
-    init {
-        isLoadingAtomic.set(false)
-    }
-
     override fun onSignInClick(login: String, password: String) {
         if (isLoadingAtomic.get()) {
             return
@@ -45,25 +41,28 @@ class SignInViewModel @Inject constructor(
             if (!isLoadingAtomic.compareAndSet(false, true)) {
                 return@launch
             }
-            _isLoadingFlow.emit(true)
-            when (val response = api.accountsLogin(LoginRequestDto(login, password))) {
-                is NetworkResponse.Success -> {
-                    db.accountsDao().putCredentials(Credentials(login, password))
-                    _navEvents.emit(SignInNavEvent.ContinueSignIn)
-                }
-                is NetworkResponse.ServerError -> {
-                    val errorsBody = response.body
-                    if (errorsBody != null) {
-                        if (errorsBody.errors.illegalLoginOrEmail != null) {
-                            _errorsFlow.emit(SignInError.IncorrectLoginOrPassword)
+            try {
+                _isLoadingFlow.emit(true)
+                when (val response = api.accountsLogin(LoginRequestDto(login, password))) {
+                    is NetworkResponse.Success -> {
+                        db.accountsDao().putCredentials(Credentials(login, password))
+                        _navEvents.emit(SignInNavEvent.ContinueSignIn)
+                    }
+                    is NetworkResponse.ServerError -> {
+                        val errorsBody = response.body
+                        if (errorsBody != null) {
+                            if (errorsBody.errors.illegalLoginOrEmail != null) {
+                                _errorsFlow.emit(SignInError.IncorrectLoginOrPassword)
+                            }
                         }
                     }
+                    is NetworkResponse.NetworkError -> _errorsFlow.emit(SignInError.BadNetwork)
+                    is NetworkResponse.UnknownError -> Unit
                 }
-                is NetworkResponse.NetworkError -> _errorsFlow.emit(SignInError.BadNetwork)
-                is NetworkResponse.UnknownError -> throw RuntimeException()
+                _isLoadingFlow.emit(false)
+            } finally {
+                isLoadingAtomic.compareAndSet(true, false)
             }
-            _isLoadingFlow.emit(false)
-            isLoadingAtomic.compareAndSet(true, false)
         }
     }
 }

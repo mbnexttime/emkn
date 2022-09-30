@@ -15,4 +15,6 @@ interface ChangePasswordInteractor {
     fun validateCode(code: String)
 
     fun sendAnotherCode()
+
+    fun loadTimer()
 }
