@@ -36,7 +36,7 @@ class VerificationCodeEditText @JvmOverloads constructor(
 
     var onVerificationCodeFilledListener: (String) -> Unit = {}
 
-    var onVerificationCodeFilledChangeListener: (Boolean) -> Unit = {}
+    var onVerificationCodeChangeListener: (Boolean) -> Unit = {}
 
     init {
         viewBinding.realVerificationCodeEditText.addTextChangedListener(
@@ -56,7 +56,7 @@ class VerificationCodeEditText @JvmOverloads constructor(
                     slotViews.render(slotValues)
                     slotViews.moveCursorToFirstEmptySlot(slotValues)
                     val filled = slotValues.isFilled()
-                    onVerificationCodeFilledChangeListener(filled)
+                    onVerificationCodeChangeListener(filled)
                     if (filled) onVerificationCodeFilledListener(slotValues.toCodeString())
                     // Uncomment if we need to clear the whole field on backspace.
                     // if (wasClearedLastSlot) viewBinding.realVerificationCodeEditText.setText("")
@@ -85,6 +85,9 @@ class VerificationCodeEditText @JvmOverloads constructor(
 
     fun isFilled(): Boolean =
         slotValues.isFilled()
+
+    fun isBlank(): Boolean =
+        slotValues.isBlank()
 
     private fun List<VerificationCodeSlotView>.render(values: Array<CharSequence?>) {
         values.forEachIndexed { index, value ->
@@ -122,6 +125,12 @@ class VerificationCodeEditText @JvmOverloads constructor(
     private fun Array<CharSequence?>.isFilled(): Boolean =
         all { it != null }
 
+    private fun Array<CharSequence?>.isBlank(): Boolean =
+        all { it == null }
+
+
     private fun Array<CharSequence?>.toCodeString(): String =
         joinToString(separator = "", prefix = "", postfix = "", limit = -1, truncated = "") { it ?: "" }
 }
+
+

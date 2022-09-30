@@ -1,9 +1,13 @@
 package com.mcs.emkn.core
 
 interface Router {
-    fun goToRegistrationScreen()
-    
     fun back()
-    
-    fun goToLoginScreen()
+
+    fun goToEmailConfirmationScreen()
+
+    fun goToForgotPasswordScreen()
+
+    fun goToChangePasswordConfirmationScreen()
+
+    fun goToCommitChangePasswordScreen()
 }

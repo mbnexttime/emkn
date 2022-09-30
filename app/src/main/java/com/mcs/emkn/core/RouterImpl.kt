@@ -17,9 +17,24 @@ class RouterImpl @Inject constructor(): Router {
         this.navController = null
     }
 
-    override fun goToRegistrationScreen() = Unit
 
-    override fun back() = Unit
+    override fun back() {
+        navController?.popBackStack()
+    }
 
-    override fun goToLoginScreen() = Unit
+    override fun goToEmailConfirmationScreen() {
+        navController?.navigate(R.id.action_authFragment_to_emailConfirmationFragment)
+    }
+
+    override fun goToForgotPasswordScreen() {
+        navController?.navigate(R.id.action_authFragment_to_forgotPasswordFragment)
+    }
+
+    override fun goToChangePasswordConfirmationScreen() {
+        navController?.navigate(R.id.action_forgotPasswordFragment_to_changePasswordConfirmationFragment)
+    }
+
+    override fun goToCommitChangePasswordScreen() {
+        navController?.navigate(R.id.action_changePasswordConfirmationFragment_to_commitChangePasswordFragment)
+    }
 }

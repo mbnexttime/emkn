@@ -1,4 +1,4 @@
-package com.mcs.emkn.ui.emailconfirmation
+package com.mcs.emkn.ui.changepassword
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -13,12 +13,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EmailConfirmationFragment : Fragment() {
-    private var _binding: FragmentConfirmationBinding? = null
+class ChangePasswordConfirmationFragment : Fragment() {
+    private var _binding : FragmentConfirmationBinding? = null
     private val binding get() = _binding!!
 
     @Inject
     lateinit var router: Router
+
     private var verificationCode: String? = null
 
     override fun onCreateView(
@@ -37,10 +38,18 @@ class EmailConfirmationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupLayout()
+        binding.sendCodeButton.setOnClickListener {
+            router.goToCommitChangePasswordScreen()
+        }
         binding.backButton.setOnClickListener {
             onBackButtonPressed()
         }
         setupCodeEditField()
+    }
+
+    private fun setupLayout() {
+        binding.confirmationHeader.text = resources.getString(R.string.change_password_confirmation_header)
     }
 
     private fun setupCodeEditField() {
