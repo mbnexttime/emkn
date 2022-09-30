@@ -7,6 +7,8 @@ interface SignUpInteractor {
 
     val errorsFlow: Flow<SignUpError>
 
+    val navEvents: Flow<SignUpNavEvent>
+
     fun onSignUpClick(
         email: String,
         login: String,

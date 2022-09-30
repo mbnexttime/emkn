@@ -7,5 +7,7 @@ interface SignInInteractor {
 
     val errorsFlow: Flow<SignInError>
 
+    val navEvents: Flow<SignInNavEvent>
+
     fun onSignInClick(login: String, password: String)
 }
