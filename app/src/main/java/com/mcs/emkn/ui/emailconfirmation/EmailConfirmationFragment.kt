@@ -59,7 +59,7 @@ class EmailConfirmationFragment : Fragment() {
             return
         }
         AlertDialog.Builder(requireContext())
-            .setTitle(R.string.sign_in_back_alert_dialog_text)
+            .setTitle(R.string.confirmation_back_alert_dialog_text)
             .setNegativeButton(R.string.sign_in_back_alert_dialog_cancel_button_text) { dialog, _ ->
                 dialog?.dismiss()
             }

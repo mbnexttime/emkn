@@ -24,7 +24,8 @@
     <string name="commit_change_password_description">Введите новый пароль</string>
     <string name="commit_change_password_submit_button">Изменить пароль</string>
     <string name="commit_change_password_hint_text">Пароль</string>
-    <string name="sign_in_back_alert_dialog_text">Введенные данные не сохранятся.</string>
+    <string name="sign_in_back_alert_dialog_text">Введенные данные не сохранятся. Вы уверены?</string>
     <string name="sign_in_back_alert_dialog_cancel_button_text">Отмена</string>
     <string name="sign_in_back_alert_dialog_ok_button_text">Ок</string>
+    <string name="confirmation_back_alert_dialog_text">Код придётся вводить заново. Вы уверены?</string>
 </resources>
