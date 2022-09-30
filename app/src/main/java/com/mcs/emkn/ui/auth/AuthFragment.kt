@@ -40,8 +40,4 @@ class AuthFragment : Fragment() {
             tab.text = resources.getString(titlesRes[position])
         }.attach()
     }
-
-    companion object {
-
-    }
 }

@@ -7,9 +7,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 class AuthPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
     override fun getItemCount(): Int = NUM_PAGES
 
-    override fun createFragment(position: Int): Fragment = when(position) {
+    override fun createFragment(position: Int): Fragment = when (position) {
         0 -> SignInFragment()
-        else -> SignUpFragment()
+        1 -> SignUpFragment()
+        else -> throw RuntimeException()
     }
     private val NUM_PAGES = 2
 }

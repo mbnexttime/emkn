@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignInBinding
+import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -21,6 +22,8 @@ class SignInFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
+
+    lateinit var signInInteractor: SignInInteractor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +43,11 @@ class SignInFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.forgotPasswordButton.setOnClickListener {
             router.goToForgotPasswordScreen()
+        }
+        binding.submitButton.setOnClickListener {
+            val login = binding.loginEditText.text?.toString() ?: return@setOnClickListener
+            val password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener
+            signInInteractor.onSignInClick(login, password)
         }
         subscribeToFormFields()
         requireActivity().onBackPressedDispatcher.addCallback(this) {

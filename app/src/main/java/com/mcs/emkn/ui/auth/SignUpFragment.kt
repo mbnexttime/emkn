@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
+import com.mcs.emkn.ui.auth.viewmodels.SignUpInteractor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -19,8 +20,11 @@ import javax.inject.Inject
 class SignUpFragment : Fragment() {
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
+
     @Inject
     lateinit var router: Router
+
+    lateinit var signUpInteractor: SignUpInteractor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +43,13 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.signUpButton.setOnClickListener {
-            router.goToEmailConfirmationScreen()
+            signUpInteractor.onSignUpClick(
+                email = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
+                login = binding.loginEditText.text?.toString() ?: return@setOnClickListener,
+                password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener,
+                name = binding.firstnameEditText.text?.toString() ?: return@setOnClickListener,
+                surname = binding.lastnameEditText.text?.toString() ?: return@setOnClickListener,
+            )
         }
         subscribeToFormFields()
         requireActivity().onBackPressedDispatcher.addCallback(this) {
@@ -57,7 +67,7 @@ class SignUpFragment : Fragment() {
     ) {
         binding.signUpButton.isEnabled =
             !(firstName.isNullOrBlank() || lastName.isNullOrBlank() || login.isNullOrBlank() ||
-                    email.isNullOrBlank() || password.isNullOrBlank())
+                email.isNullOrBlank() || password.isNullOrBlank())
     }
 
     private fun subscribeToFormFields() {
