@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class LoginErrorResponseErrorsDto(
-    @Json(name = "illegal_login_or_email") val illegalLogin: NetError?,
+    @Json(name = "illegal_login_or_email") val illegalLoginOrEmail: NetError?,
 )
