@@ -22,6 +22,9 @@ interface AccountsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun putCredentials(credentials: Credentials)
 
+    @Query("DELETE * FROM $CREDENTIALS_TABLE_NAME")
+    fun deleteCredentials()
+
     @Query("SELECT * FROM $SIGN_UP_ATTEMPT_TABLE_NAME")
     fun getSignUpAttempts(): List<SignUpAttempt>
 

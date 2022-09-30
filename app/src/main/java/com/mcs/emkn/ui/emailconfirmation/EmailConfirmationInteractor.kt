@@ -6,6 +6,12 @@ interface EmailConfirmationInteractor {
     val errors: Flow<EmailConfirmationError>
 
     val navEvents: Flow<EmailConfirmationNavEvent>
+    
+    val timer: Flow<Long>
 
-    fun submitCode(code: String)
+    fun validateCode(code: String)
+
+    fun sendAnotherCode()
+
+    fun loadTimer()
 }

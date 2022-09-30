@@ -52,19 +52,21 @@ class SignUpViewModel @Inject constructor(
                 )
                 when (response) {
                     is NetworkResponse.Success -> {
-                        database.accountsDao().deleteSignUpAttempts()
-                        database.accountsDao().putSignUpAttempt(
-                            SignUpAttempt(
-                                email = email,
-                                login = login,
-                                password = password,
-                                name = name,
-                                surName = surname,
-                                randomToken = response.body.randomToken,
-                                expiresIn = response.body.expiresIn,
-                                createdAt = System.currentTimeMillis(),
+                        database.runInTransaction {
+                            database.accountsDao().deleteSignUpAttempts()
+                            database.accountsDao().putSignUpAttempt(
+                                SignUpAttempt(
+                                    email = email,
+                                    login = login,
+                                    password = password,
+                                    name = name,
+                                    surName = surname,
+                                    randomToken = response.body.randomToken,
+                                    expiresInSeconds = response.body.expiresIn.toLong(),
+                                    createdAt = System.currentTimeMillis(),
+                                )
                             )
-                        )
+                        }
                         _navEvents.emit(SignUpNavEvent.ContinueSignUp)
                     }
                     is NetworkResponse.ServerError -> {

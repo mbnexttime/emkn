@@ -45,7 +45,10 @@ class SignInViewModel @Inject constructor(
                 _isLoadingFlow.emit(true)
                 when (val response = api.accountsLogin(LoginRequestDto(login, password))) {
                     is NetworkResponse.Success -> {
-                        db.accountsDao().putCredentials(Credentials(login, password))
+                        db.runInTransaction {
+                            db.accountsDao().deleteCredentials()
+                            db.accountsDao().putCredentials(Credentials(login, password))
+                        }
                         _navEvents.emit(SignInNavEvent.ContinueSignIn)
                     }
                     is NetworkResponse.ServerError -> {

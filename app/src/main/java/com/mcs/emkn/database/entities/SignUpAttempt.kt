@@ -13,7 +13,7 @@ data class SignUpAttempt(
     val name: String,
     val surName: String,
     val randomToken: String,
-    val expiresIn: String,
+    val expiresInSeconds: Long,
     val createdAt: Long,
 ) {
     companion object {
