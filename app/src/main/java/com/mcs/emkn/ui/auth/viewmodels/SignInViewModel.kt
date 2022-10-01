@@ -62,9 +62,9 @@ class SignInViewModel @Inject constructor(
                     is NetworkResponse.NetworkError -> _errorsFlow.emit(SignInError.BadNetwork)
                     is NetworkResponse.UnknownError -> Unit
                 }
-                _isLoadingFlow.emit(false)
             } finally {
                 isLoadingAtomic.compareAndSet(true, false)
+                _isLoadingFlow.emit(false)
             }
         }
     }

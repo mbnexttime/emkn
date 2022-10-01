@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mcs.emkn">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
         android:name=".EmknApplication"
         android:allowBackup="true"
@@ -13,10 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Emkn"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".EmknMainActivity"
-            android:exported="true">
+            android:configChanges="orientation|colorMode|keyboard|keyboardHidden|locale|layoutDirection|screenLayout|density|uiMode"
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,5 +30,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

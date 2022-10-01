@@ -89,7 +89,8 @@ class SignUpViewModel @Inject constructor(
                     is NetworkResponse.UnknownError -> Unit
                 }
             } finally {
-                isLoadingAtomic.compareAndSet(false, true)
+                isLoadingAtomic.compareAndSet(true, false)
+                _isLoadingFlow.emit(false)
             }
         }
     }

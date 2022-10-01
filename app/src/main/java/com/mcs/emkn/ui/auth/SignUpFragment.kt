@@ -19,6 +19,7 @@ import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
 import com.mcs.emkn.ui.auth.viewmodels.*
+
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,6 +35,7 @@ class SignUpFragment : Fragment() {
     private val signUpInteractor: SignUpInteractor by viewModels<SignUpViewModel>()
 
     private var isLoadingStarted = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
