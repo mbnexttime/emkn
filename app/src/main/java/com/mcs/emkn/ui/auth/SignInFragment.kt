@@ -62,7 +62,6 @@ class SignInFragment : Fragment() {
             val login = binding.loginEditText.text?.toString() ?: return@setOnClickListener
             val password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener
             signInInteractor.onSignInClick(login, password)
-            isLoadingStarted = true
             binding.submitButton.isEnabled = false
         }
         subscribeToFormFields()
@@ -124,7 +123,6 @@ class SignInFragment : Fragment() {
                 signInInteractor.isLoadingFlow.collect { isLoading ->
                     binding.progressBar.isVisible = isLoading
                     isLoadingStarted = isLoading
-                    Log.d("signin", isLoading.toString())
                 }
             }
         }
