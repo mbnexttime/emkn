@@ -52,6 +52,7 @@ class SignUpViewModel @Inject constructor(
                         lastName = surname
                     )
                 )
+
                 when (response) {
                     is NetworkResponse.Success -> {
                         database.runInTransaction {
@@ -63,8 +64,8 @@ class SignUpViewModel @Inject constructor(
                                     password = password,
                                     name = name,
                                     surName = surname,
-                                    randomToken = response.body.randomToken,
-                                    expiresInSeconds = response.body.expiresIn.toLong(),
+                                    randomToken = response.body.tokenAndTimeDto.randomToken,
+                                    expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
                                     createdAt = System.currentTimeMillis(),
                                 )
                             )
