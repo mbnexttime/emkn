@@ -7,15 +7,21 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
-import com.mcs.emkn.ui.auth.viewmodels.SignUpInteractor
-import com.mcs.emkn.ui.auth.viewmodels.SignUpViewModel
+import com.mcs.emkn.ui.auth.viewmodels.*
+
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,6 +33,9 @@ class SignUpFragment : Fragment() {
     lateinit var router: Router
 
     private val signUpInteractor: SignUpInteractor by viewModels<SignUpViewModel>()
+
+    private var isLoadingStarted = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +54,8 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.signUpButton.setOnClickListener {
+            clearErrorFields()
+            binding.signUpButton.isEnabled = false
             signUpInteractor.onSignUpClick(
                 email = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
                 login = binding.loginEditText.text?.toString() ?: return@setOnClickListener,
@@ -58,6 +69,10 @@ class SignUpFragment : Fragment() {
             onBackButtonPressed()
             this.isEnabled = true
         }
+
+        subscribeToLoadingStatus()
+        subscribeToErrorsStatus()
+        subscribeToNavStatus()
     }
 
     private fun decideSignUpButtonEnabledState(
@@ -69,7 +84,7 @@ class SignUpFragment : Fragment() {
     ) {
         binding.signUpButton.isEnabled =
             !(firstName.isNullOrBlank() || lastName.isNullOrBlank() || login.isNullOrBlank() ||
-                email.isNullOrBlank() || password.isNullOrBlank())
+                    email.isNullOrBlank() || password.isNullOrBlank() || isLoadingStarted)
     }
 
     private fun subscribeToFormFields() {
@@ -127,5 +142,67 @@ class SignUpFragment : Fragment() {
                 router.back()
             }
             .show()
+    }
+
+    private fun subscribeToLoadingStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signUpInteractor.isLoadingFlow.collect { isLoading ->
+                    binding.progressBar.isVisible = isLoading
+                    isLoadingStarted = isLoading
+                }
+            }
+        }
+    }
+
+    private fun subscribeToErrorsStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signUpInteractor.errorsFlow.collect { error ->
+                    when (error) {
+                        is SignUpError.BadNetwork -> {
+                            Toast
+                                .makeText(
+                                    requireContext(),
+                                    resources.getString(R.string.bad_network_error),
+                                    Toast.LENGTH_LONG
+                                )
+                                .show()
+                        }
+                        is SignUpError.IllegalLogin -> {
+                            binding.underLoginTextView.text =
+                                resources.getString(R.string.incorrect_login_error)
+                        }
+                        is SignUpError.IllegalPassword -> {
+                            binding.underPasswordTextView.text =
+                                resources.getString(R.string.incorrect_password_error)
+                        }
+                        is SignUpError.LoginIsNotAvailable -> {
+                            binding.underLoginTextView.text =
+                                resources.getString(R.string.login_not_available_error)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun subscribeToNavStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signUpInteractor.navEvents.collect { navEvent ->
+                    when (navEvent) {
+                        is SignUpNavEvent.ContinueSignUp -> {
+                            router.goToEmailConfirmationScreen()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun clearErrorFields() {
+        binding.underPasswordTextView.text = ""
+        binding.underLoginTextView.text = ""
     }
 }

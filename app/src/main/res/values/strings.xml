@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">emkn</string>
-    <string name="sign_up_button_text">Зарегистрироваться</string>
+    <string name="sign_up_button_text">Регистрация</string>
     <string name="sign_up_tab_text">Регистрация</string>
-    <string name="sign_in_button_text">Войти</string>
+    <string name="sign_in_button_text">Вход</string>
     <string name="sign_in_email_text_layout_hint">Логин</string>
     <string name="sign_in_password_text_layout_hint">Пароль</string>
     <string name="sign_up_firstname_text_layout_hint">Имя</string>
@@ -30,4 +30,7 @@
     <string name="confirmation_back_alert_dialog_text">Код придётся вводить заново. Вы уверены?</string>
     <string name="incorrect_login_or_email_error">Некорректный логин или пароль</string>
     <string name="bad_network_error">Нет доступа к сети</string>
+    <string name="incorrect_login_error">Некорректный логин</string>
+    <string name="incorrect_password_error">Некорректный пароль</string>
+    <string name="login_not_available_error">Логин уже занят</string>
 </resources>
