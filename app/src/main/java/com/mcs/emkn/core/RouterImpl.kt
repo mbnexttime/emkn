@@ -37,4 +37,12 @@ class RouterImpl @Inject constructor(): Router {
     override fun goToCommitChangePasswordScreen() {
         navController?.navigate(R.id.action_changePasswordConfirmationFragment_to_commitChangePasswordFragment)
     }
+
+    override fun goToRegistrationNavGraph() {
+        navController?.navigate(R.id.action_registrationNavGraph)
+    }
+
+    override fun goToUserNavGraph() {
+        navController?.navigate(R.id.action_userNavGraph)
+    }
 }

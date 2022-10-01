@@ -2,17 +2,28 @@ package com.mcs.emkn.ui.auth
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignInBinding
+import com.mcs.emkn.ui.auth.viewmodels.SignInError
 import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
+import com.mcs.emkn.ui.auth.viewmodels.SignInNavEvent
+import com.mcs.emkn.ui.auth.viewmodels.SignInViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -23,7 +34,9 @@ class SignInFragment : Fragment() {
     @Inject
     lateinit var router: Router
 
-    lateinit var signInInteractor: SignInInteractor
+    private val signInInteractor: SignInInteractor by viewModels<SignInViewModel>()
+
+    private var isLoadingStarted = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,19 +58,26 @@ class SignInFragment : Fragment() {
             router.goToForgotPasswordScreen()
         }
         binding.submitButton.setOnClickListener {
+            clearErrorFields()
             val login = binding.loginEditText.text?.toString() ?: return@setOnClickListener
             val password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener
             signInInteractor.onSignInClick(login, password)
+            binding.submitButton.isEnabled = false
         }
         subscribeToFormFields()
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             onBackButtonPressed()
             this.isEnabled = true
         }
+
+        subscribeToLoadingStatus()
+        subscribeToErrorsStatus()
+        subscribeToNavStatus()
     }
 
     private fun decideSignInButtonEnabledState(login: String?, password: String?) {
-        binding.submitButton.isEnabled = !(login.isNullOrBlank() || password.isNullOrBlank())
+        binding.submitButton.isEnabled =
+            !(login.isNullOrBlank() || password.isNullOrBlank() || isLoadingStarted)
     }
 
     private fun subscribeToFormFields() {
@@ -95,5 +115,58 @@ class SignInFragment : Fragment() {
                 router.back()
             }
             .show()
+    }
+
+    private fun subscribeToLoadingStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signInInteractor.isLoadingFlow.collect { isLoading ->
+                    binding.progressBar.isVisible = isLoading
+                    isLoadingStarted = isLoading
+                }
+            }
+        }
+    }
+
+    private fun subscribeToErrorsStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signInInteractor.errorsFlow.collect { error ->
+                    when (error) {
+                        is SignInError.BadNetwork -> {
+                            Toast
+                                .makeText(
+                                    requireContext(),
+                                    resources.getString(R.string.bad_network_error),
+                                    Toast.LENGTH_LONG
+                                )
+                                .show()
+                        }
+                        is SignInError.IncorrectLoginOrPassword -> {
+                            binding.underPasswordTextView.text =
+                                resources.getString(R.string.incorrect_login_or_email_error)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun subscribeToNavStatus() {
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                signInInteractor.navEvents.collect { navEvent ->
+                    when(navEvent) {
+                        is SignInNavEvent.ContinueSignIn -> {
+                            router.goToUserNavGraph()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun clearErrorFields() {
+        binding.underPasswordTextView.text = ""
     }
 }
