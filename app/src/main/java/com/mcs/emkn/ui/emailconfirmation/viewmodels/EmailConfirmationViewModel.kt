@@ -1,4 +1,4 @@
-package com.mcs.emkn.ui.emailconfirmation
+package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

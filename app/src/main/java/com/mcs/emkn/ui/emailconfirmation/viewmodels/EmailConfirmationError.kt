@@ -1,4 +1,4 @@
-package com.mcs.emkn.ui.emailconfirmation
+package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
 sealed class EmailConfirmationError {
     object InvalidCode : EmailConfirmationError()

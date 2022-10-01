@@ -1,4 +1,4 @@
-package com.mcs.emkn.ui.emailconfirmation
+package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
 import kotlinx.coroutines.flow.Flow
 
