@@ -17,7 +17,19 @@ import retrofit2.Response
 
 class MockApi : Api {
     override suspend fun accountsRegister(request: RegistrationRequestDto): NetworkResponse<ResponseWithTokenAndTimeDto, RegistrationErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            ResponseWithTokenAndTimeDto("hdjshd", "4000000000"),
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            RegistrationErrorResponseDto(
+                RegistrationErrorResponseErrorsDto(
+                    NetError("1"), null, null
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun validateEmail(request: ValidateEmailRequestDto): NetworkResponse<Unit, ValidateEmailErrorResponseDto> {

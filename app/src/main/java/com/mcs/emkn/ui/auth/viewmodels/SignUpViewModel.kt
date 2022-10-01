@@ -8,6 +8,7 @@ import com.mcs.emkn.database.entities.SignUpAttempt
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RegistrationRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,11 +37,12 @@ class SignUpViewModel @Inject constructor(
         if (isLoadingAtomic.get()) {
             return
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!isLoadingAtomic.compareAndSet(false, true)) {
                 return@launch
             }
             try {
+                _isLoadingFlow.emit(true)
                 val response = api.accountsRegister(
                     RegistrationRequestDto(
                         login = login,
