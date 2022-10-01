@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
-import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.network.Api
+import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -47,10 +47,7 @@ class EmailConfirmationViewModel @Inject constructor(
                 val response = api.validateEmail(ValidateEmailRequestDto(code, attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
-                        db.runInTransaction {
-                            db.accountsDao().deleteSignUpAttempts()
-                            db.accountsDao().putCredentials(Credentials(attempt.login, attempt.password))
-                        }
+                        db.accountsDao().deleteSignUpAttempts()
                         _navEvents.emit(EmailConfirmationNavEvent.ContinueConfirmation)
                     }
                     is NetworkResponse.ServerError -> {
@@ -90,6 +87,24 @@ class EmailConfirmationViewModel @Inject constructor(
             }
             try {
                 val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
+                val response = api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val newAttempt = attempt.copy(
+                            randomToken = response.body.randomToken,
+                            expiresInSeconds = response.body.expiresIn.toLong(),
+                            createdAt = System.currentTimeMillis(),
+                        )
+                        db.runInTransaction {
+                            db.accountsDao().deleteSignUpAttempts()
+                            db.accountsDao().putSignUpAttempt(newAttempt)
+                        }
+                        _timer.emit(newAttempt.expiresInSeconds)
+                    }
+                    is NetworkResponse.ServerError -> Unit
+                    is NetworkResponse.NetworkError -> _errors.emit(EmailConfirmationError.BadNetwork)
+                    is NetworkResponse.UnknownError -> Unit
+                }
             } finally {
                 isSendingCodeAtomic.compareAndSet(true, false)
             }

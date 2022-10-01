@@ -7,7 +7,7 @@ import com.mcs.emkn.database.Database
 import com.mcs.emkn.database.entities.ChangePasswordAttempt
 import com.mcs.emkn.database.entities.ChangePasswordCommit
 import com.mcs.emkn.network.Api
-import com.mcs.emkn.network.dto.request.BeginChangePasswordRequestDto
+import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,11 +23,11 @@ class ChangePasswordViewModel @Inject constructor(
     private val db: Database,
 ) : ViewModel(), ChangePasswordInteractor {
     override val errors: Flow<ChangePasswordError>
-        get() = TODO("Not yet implemented")
+        get() = _errors
     override val navEvents: Flow<ChangePasswordNavEvent>
-        get() = TODO("Not yet implemented")
+        get() = _navEvents
     override val timerFlow: Flow<Long>
-        get() = TODO("Not yet implemented")
+        get() = _timerFlow
 
     private val _errors = MutableSharedFlow<ChangePasswordError>()
     private val _navEvents = MutableSharedFlow<ChangePasswordNavEvent>()
@@ -86,8 +86,7 @@ class ChangePasswordViewModel @Inject constructor(
             }
             try {
                 val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
-                val response = api.accountsBeginChangePassword(BeginChangePasswordRequestDto(attempt.credentials))
-                when (response) {
+                when (val response = api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
                     is NetworkResponse.Success -> {
                         val newAttempt = ChangePasswordAttempt(
                             credentials = attempt.credentials,

@@ -22,13 +22,13 @@ interface AccountsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun putCredentials(credentials: Credentials)
 
-    @Query("DELETE * FROM $CREDENTIALS_TABLE_NAME")
+    @Query("DELETE FROM $CREDENTIALS_TABLE_NAME")
     fun deleteCredentials()
 
     @Query("SELECT * FROM $SIGN_UP_ATTEMPT_TABLE_NAME")
     fun getSignUpAttempts(): List<SignUpAttempt>
 
-    @Query("DELETE * FROM $SIGN_UP_ATTEMPT_TABLE_NAME")
+    @Query("DELETE FROM $SIGN_UP_ATTEMPT_TABLE_NAME")
     fun deleteSignUpAttempts()
 
     @Insert(onConflict = ABORT)
@@ -40,7 +40,7 @@ interface AccountsDao {
     @Query("SELECT * FROM $CHANGE_PASSWORD_ATTEMPT_TABLE_NAME")
     fun getChangePasswordAttempts(): List<ChangePasswordAttempt>
 
-    @Query("DELETE * FROM $CHANGE_PASSWORD_ATTEMPT_TABLE_NAME")
+    @Query("DELETE FROM $CHANGE_PASSWORD_ATTEMPT_TABLE_NAME")
     fun deleteChangePasswordAttempts()
 
     @Insert(onConflict = ABORT)
@@ -49,6 +49,6 @@ interface AccountsDao {
     @Query("SELECT * FROM $CHANGE_PASSWORD_COMMIT_TABLE_NAME")
     fun getChangePasswordCommits(): List<ChangePasswordCommit>
 
-    @Query("DELETE * FROM $CHANGE_PASSWORD_COMMIT_TABLE_NAME")
+    @Query("DELETE FROM $CHANGE_PASSWORD_COMMIT_TABLE_NAME")
     fun deleteChangePasswordCommits()
 }

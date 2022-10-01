@@ -46,7 +46,7 @@ class SignInViewModel @Inject constructor(
                 when (val response = api.accountsLogin(LoginRequestDto(login, password))) {
                     is NetworkResponse.Success -> {
                         db.runInTransaction {
-                            db.accountsDao().deleteCredentials()
+                            db.clearAllTables()
                             db.accountsDao().putCredentials(Credentials(login, password))
                         }
                         _navEvents.emit(SignInNavEvent.ContinueSignIn)
