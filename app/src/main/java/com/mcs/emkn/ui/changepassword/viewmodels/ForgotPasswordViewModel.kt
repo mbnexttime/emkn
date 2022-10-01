@@ -43,8 +43,8 @@ class ForgotPasswordViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         val attempt = ChangePasswordAttempt(
                             credentials = credentials,
-                            randomToken = response.body.randomToken,
-                            expiresInSeconds = response.body.expiresIn.toLong(),
+                            randomToken = response.body.tokenAndTimeDto.randomToken,
+                            expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
                             createdAt = System.currentTimeMillis()
                         )
                         database.runInTransaction {

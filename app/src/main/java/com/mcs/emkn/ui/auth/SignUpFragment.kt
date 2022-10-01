@@ -18,9 +18,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
-import com.mcs.emkn.ui.auth.viewmodels.*
+import com.mcs.emkn.ui.auth.viewmodels.SignUpError
+import com.mcs.emkn.ui.auth.viewmodels.SignUpInteractor
+import com.mcs.emkn.ui.auth.viewmodels.SignUpNavEvent
+import com.mcs.emkn.ui.auth.viewmodels.SignUpViewModel
 import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorage
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -91,7 +93,7 @@ class SignUpFragment : Fragment() {
     ) {
         binding.signUpButton.isEnabled =
             !(firstName.isNullOrBlank() || lastName.isNullOrBlank() || login.isNullOrBlank() ||
-                    email.isNullOrBlank() || password.isNullOrBlank() || isLoadingStarted)
+                email.isNullOrBlank() || password.isNullOrBlank() || isLoadingStarted)
     }
 
     private fun subscribeToFormFields() {
@@ -157,6 +159,13 @@ class SignUpFragment : Fragment() {
                 signUpInteractor.isLoadingFlow.collect { isLoading ->
                     binding.progressBar.isVisible = isLoading
                     isLoadingStarted = isLoading
+                    decideSignUpButtonEnabledState(
+                        firstName = binding.firstnameEditText.text?.toString(),
+                        lastName = binding.lastnameEditText.text?.toString(),
+                        login = binding.loginEditText.text?.toString(),
+                        email = binding.emailEditText.text?.toString(),
+                        password = binding.passwordEditText.text?.toString()
+                    )
                 }
             }
         }

@@ -113,8 +113,8 @@ class EmailConfirmationViewModel @Inject constructor(
                 when (response) {
                     is NetworkResponse.Success -> {
                         val newAttempt = attempt.copy(
-                            randomToken = response.body.randomToken,
-                            expiresInSeconds = response.body.expiresIn.toLong(),
+                            randomToken = response.body.tokenAndTimeDto.randomToken,
+                            expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
                             createdAt = System.currentTimeMillis(),
                         )
                         db.runInTransaction {
