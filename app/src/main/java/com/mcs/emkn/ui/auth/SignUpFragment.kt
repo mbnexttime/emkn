@@ -9,10 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentSignUpBinding
 import com.mcs.emkn.ui.auth.viewmodels.SignUpInteractor
+import com.mcs.emkn.ui.auth.viewmodels.SignUpViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -24,7 +26,7 @@ class SignUpFragment : Fragment() {
     @Inject
     lateinit var router: Router
 
-    lateinit var signUpInteractor: SignUpInteractor
+    private val signUpInteractor: SignUpInteractor by viewModels<SignUpViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
