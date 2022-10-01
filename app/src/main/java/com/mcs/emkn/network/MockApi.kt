@@ -20,7 +20,7 @@ class MockApi : Api {
         delay(1000)
         val success = true
         return if (success) NetworkResponse.Success(
-            ResponseWithTokenAndTimeDto("hdjshd", "4000000000"),
+            ResponseWithTokenAndTimeDto("hdjshd", "5"),
             Response.success(200, "OK")
         )
         else NetworkResponse.ServerError(
@@ -33,7 +33,19 @@ class MockApi : Api {
     }
 
     override suspend fun validateEmail(request: ValidateEmailRequestDto): NetworkResponse<Unit, ValidateEmailErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            Unit,
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            ValidateEmailErrorResponseDto(
+                ValidateEmailErrorResponseErrorsDto(
+                    NetError("1"), NetError("2")
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun accountsLogin(request: LoginRequestDto): NetworkResponse<Unit, LoginErrorResponseDto> {
@@ -62,6 +74,15 @@ class MockApi : Api {
     }
 
     override suspend fun accountsRevalidateCredentials(request: RevalidateCredentialsDto): NetworkResponse<ResponseWithTokenAndTimeDto, Unit> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            ResponseWithTokenAndTimeDto("hdjshd", "5"),
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            Unit
+            , response = Response.success(200, "BAD")
+        )
     }
 }

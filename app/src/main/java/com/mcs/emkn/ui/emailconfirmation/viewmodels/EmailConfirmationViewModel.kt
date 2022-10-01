@@ -1,5 +1,6 @@
 package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
@@ -12,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -33,6 +35,8 @@ class EmailConfirmationViewModel @Inject constructor(
 
     private val isValidatingAtomic = AtomicBoolean(false)
     private val isSendingCodeAtomic = AtomicBoolean(false)
+
+    private var countDownTimer: CountDownTimer? = null
 
     override fun validateCode(code: String) {
         if (isValidatingAtomic.get()) {
@@ -71,10 +75,28 @@ class EmailConfirmationViewModel @Inject constructor(
     }
 
     override fun loadTimer() {
+        countDownTimer?.cancel()
         viewModelScope.launch(Dispatchers.IO) {
             val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-            _timer.emit(attempt.expiresInSeconds - (System.currentTimeMillis() - attempt.createdAt) / 1000)
+            withContext(Dispatchers.Main) {
+                startSendCodeTimer(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
+            }
         }
+    }
+
+    private fun startSendCodeTimer(timeMills: Long) {
+        countDownTimer = object : CountDownTimer(timeMills, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                viewModelScope.launch {
+                    _timer.emit(millisUntilFinished / 1000)
+                }
+            }
+            override fun onFinish() {
+                viewModelScope.launch {
+                    _timer.emit(0)
+                }
+            }
+        }.apply { start() }
     }
 
     override fun sendAnotherCode() {
@@ -99,7 +121,10 @@ class EmailConfirmationViewModel @Inject constructor(
                             db.accountsDao().deleteSignUpAttempts()
                             db.accountsDao().putSignUpAttempt(newAttempt)
                         }
-                        _timer.emit(newAttempt.expiresInSeconds)
+                        countDownTimer?.cancel()
+                        withContext(Dispatchers.Main) {
+                            startSendCodeTimer(newAttempt.expiresInSeconds * 1000)
+                        }
                     }
                     is NetworkResponse.ServerError -> Unit
                     is NetworkResponse.NetworkError -> _errors.emit(EmailConfirmationError.BadNetwork)

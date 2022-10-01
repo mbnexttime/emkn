@@ -2,7 +2,6 @@ package com.mcs.emkn.ui.auth
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +21,7 @@ import com.mcs.emkn.ui.auth.viewmodels.SignInError
 import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
 import com.mcs.emkn.ui.auth.viewmodels.SignInNavEvent
 import com.mcs.emkn.ui.auth.viewmodels.SignInViewModel
+import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,6 +33,8 @@ class SignInFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
+    @Inject
+    lateinit var credentialsStorage: UiCredentialsStorage
 
     private val signInInteractor: SignInInteractor by viewModels<SignInViewModel>()
 
@@ -69,10 +71,16 @@ class SignInFragment : Fragment() {
             onBackButtonPressed()
             this.isEnabled = true
         }
+        insertLoginPassword()
 
         subscribeToLoadingStatus()
         subscribeToErrorsStatus()
         subscribeToNavStatus()
+    }
+
+    private fun insertLoginPassword() {
+        binding.loginEditText.setText(credentialsStorage.login)
+        binding.passwordEditText.setText(credentialsStorage.password)
     }
 
     private fun decideSignInButtonEnabledState(login: String?, password: String?) {
