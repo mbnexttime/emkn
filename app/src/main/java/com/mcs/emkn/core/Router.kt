@@ -10,4 +10,8 @@ interface Router {
     fun goToChangePasswordConfirmationScreen()
 
     fun goToCommitChangePasswordScreen()
+
+    fun goToRegistrationNavGraph()
+
+    fun goToUserNavGraph()
 }
