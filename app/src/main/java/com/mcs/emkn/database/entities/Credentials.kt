@@ -9,6 +9,7 @@ data class Credentials(
     @PrimaryKey
     val login: String,
     val password: String,
+    val isAuthorized: Boolean
 ) {
     companion object {
         const val CREDENTIALS_TABLE_NAME = "credentials"

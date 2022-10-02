@@ -16,14 +16,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
+import com.mcs.emkn.database.Database
 import com.mcs.emkn.databinding.FragmentSignInBinding
 import com.mcs.emkn.ui.auth.viewmodels.SignInError
 import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
 import com.mcs.emkn.ui.auth.viewmodels.SignInNavEvent
 import com.mcs.emkn.ui.auth.viewmodels.SignInViewModel
-import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,7 +36,7 @@ class SignInFragment : Fragment() {
     @Inject
     lateinit var router: Router
     @Inject
-    lateinit var credentialsStorage: UiCredentialsStorage
+    lateinit var db: Database
 
     private val signInInteractor: SignInInteractor by viewModels<SignInViewModel>()
 
@@ -79,8 +81,13 @@ class SignInFragment : Fragment() {
     }
 
     private fun insertLoginPassword() {
-        binding.loginEditText.setText(credentialsStorage.login)
-        binding.passwordEditText.setText(credentialsStorage.password)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val credentials = db.accountsDao().getCredentials().firstOrNull() ?:return@launch
+            withContext(Dispatchers.Main) {
+                binding.loginEditText.setText(credentials.login)
+                binding.passwordEditText.setText(credentials.password)
+            }
+        }
     }
 
     private fun decideSignInButtonEnabledState(login: String?, password: String?) {

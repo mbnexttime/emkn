@@ -12,6 +12,7 @@ import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenDto
+import com.mcs.emkn.network.dto.response.TokenAndTimeDto
 import kotlinx.coroutines.delay
 import retrofit2.Response
 
@@ -20,7 +21,7 @@ class MockApi : Api {
         delay(1000)
         val success = true
         return if (success) NetworkResponse.Success(
-            ResponseWithTokenAndTimeDto("hdjshd", "5"),
+            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
             Response.success(200, "OK")
         )
         else NetworkResponse.ServerError(
@@ -77,7 +78,7 @@ class MockApi : Api {
         delay(1000)
         val success = true
         return if (success) NetworkResponse.Success(
-            ResponseWithTokenAndTimeDto("hdjshd", "5"),
+            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
             Response.success(200, "OK")
         )
         else NetworkResponse.ServerError(

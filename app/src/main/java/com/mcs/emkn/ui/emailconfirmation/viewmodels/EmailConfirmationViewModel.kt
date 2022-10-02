@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
+import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
@@ -36,7 +37,6 @@ class EmailConfirmationViewModel @Inject constructor(
     private val isValidatingAtomic = AtomicBoolean(false)
     private val isSendingCodeAtomic = AtomicBoolean(false)
 
-    private var countDownTimer: CountDownTimer? = null
 
     override fun validateCode(code: String) {
         if (isValidatingAtomic.get()) {
@@ -51,6 +51,8 @@ class EmailConfirmationViewModel @Inject constructor(
                 val response = api.validateEmail(ValidateEmailRequestDto(code, attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
+                        db.accountsDao()
+                            .putCredentials(Credentials(attempt.login, attempt.password, false))
                         db.accountsDao().deleteSignUpAttempts()
                         _navEvents.emit(EmailConfirmationNavEvent.ContinueConfirmation)
                     }
@@ -75,29 +77,12 @@ class EmailConfirmationViewModel @Inject constructor(
     }
 
     override fun loadTimer() {
-        countDownTimer?.cancel()
         viewModelScope.launch(Dispatchers.IO) {
             val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-            withContext(Dispatchers.Main) {
-                startSendCodeTimer(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
-            }
+            _timer.emit(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
         }
     }
 
-    private fun startSendCodeTimer(timeMills: Long) {
-        countDownTimer = object : CountDownTimer(timeMills, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                viewModelScope.launch {
-                    _timer.emit(millisUntilFinished / 1000)
-                }
-            }
-            override fun onFinish() {
-                viewModelScope.launch {
-                    _timer.emit(0)
-                }
-            }
-        }.apply { start() }
-    }
 
     override fun sendAnotherCode() {
         if (isSendingCodeAtomic.get()) {
@@ -109,7 +94,8 @@ class EmailConfirmationViewModel @Inject constructor(
             }
             try {
                 val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-                val response = api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
+                val response =
+                    api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
                         val newAttempt = attempt.copy(
@@ -121,10 +107,7 @@ class EmailConfirmationViewModel @Inject constructor(
                             db.accountsDao().deleteSignUpAttempts()
                             db.accountsDao().putSignUpAttempt(newAttempt)
                         }
-                        countDownTimer?.cancel()
-                        withContext(Dispatchers.Main) {
-                            startSendCodeTimer(newAttempt.expiresInSeconds * 1000)
-                        }
+                        _timer.emit(newAttempt.expiresInSeconds * 1000)
                     }
                     is NetworkResponse.ServerError -> Unit
                     is NetworkResponse.NetworkError -> _errors.emit(EmailConfirmationError.BadNetwork)

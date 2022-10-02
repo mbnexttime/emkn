@@ -39,7 +39,7 @@ class EmknMainActivity : AppCompatActivity() {
 
     private fun chooseNavGraph() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val isLogged = db.accountsDao().getCredentials().isNotEmpty()
+            val isLogged = db.accountsDao().getCredentials().firstOrNull()?.isAuthorized ?: false
             withContext(Dispatchers.Main) {
                 if(isLogged) {
                     routerImpl.goToUserNavGraph()

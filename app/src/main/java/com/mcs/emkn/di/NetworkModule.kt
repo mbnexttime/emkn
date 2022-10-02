@@ -5,6 +5,7 @@ import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
 import com.haroldadmin.cnradapter.NetworkResponseAdapterFactory
 import com.mcs.emkn.BuildConfig
 import com.mcs.emkn.network.Api
+import com.mcs.emkn.network.MockApi
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module

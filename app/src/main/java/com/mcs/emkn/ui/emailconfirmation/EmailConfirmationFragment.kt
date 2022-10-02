@@ -2,6 +2,7 @@ package com.mcs.emkn.ui.emailconfirmation
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.mcs.emkn.R
@@ -39,6 +41,7 @@ class EmailConfirmationFragment : Fragment() {
     lateinit var router: Router
     private var verificationCode: String = ""
     private var timerStarted = false
+    private var countDownTimer: CountDownTimer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,11 +70,12 @@ class EmailConfirmationFragment : Fragment() {
         }
         setupCodeEditField()
 
-        emailConfirmationInteractor.loadTimer()
-        timerStarted = true
+
         subscribeToTimerStatus()
         subscribeToErrorsStatus()
         subscribeToNavStatus()
+
+        emailConfirmationInteractor.loadTimer()
     }
 
     private fun setupCodeEditField() {
@@ -156,21 +160,30 @@ class EmailConfirmationFragment : Fragment() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 emailConfirmationInteractor.timer.collect { timer ->
-                    if (timer == 0L) {
-                        timerStarted = false
-                        binding.sendCodeAgainButton.isVisible = true
-                        binding.timerTextVIew.isVisible = false
-                    } else {
-                        if(!timerStarted) {
-                            timerStarted = true
-                            binding.sendCodeAgainButton.isVisible = false
-                            binding.timerTextVIew.isVisible = true
-                        }
-                        binding.timerTextVIew.text =
-                            resources.getString(R.string.send_code_again_in, timer)
+                    if (!timerStarted) {
+                        timerStarted = true
+                        binding.sendCodeAgainButton.isVisible = false
+                        binding.timerTextVIew.isVisible = true
                     }
+                    countDownTimer?.cancel()
+                    startSendCodeTimer(timer)
                 }
             }
         }
+    }
+
+    private fun startSendCodeTimer(timeMills: Long) {
+        countDownTimer = object : CountDownTimer(timeMills, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                binding.timerTextVIew.text =
+                    resources.getString(R.string.send_code_again_in, millisUntilFinished / 1000)
+            }
+
+            override fun onFinish() {
+                timerStarted = false
+                binding.sendCodeAgainButton.isVisible = true
+                binding.timerTextVIew.isVisible = false
+            }
+        }.apply { start() }
     }
 }

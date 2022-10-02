@@ -22,7 +22,6 @@ import com.mcs.emkn.ui.auth.viewmodels.SignUpError
 import com.mcs.emkn.ui.auth.viewmodels.SignUpInteractor
 import com.mcs.emkn.ui.auth.viewmodels.SignUpNavEvent
 import com.mcs.emkn.ui.auth.viewmodels.SignUpViewModel
-import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,8 +33,6 @@ class SignUpFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
-    @Inject
-    lateinit var credentialsStorage: UiCredentialsStorage
 
     private val signUpInteractor: SignUpInteractor by viewModels<SignUpViewModel>()
 
@@ -61,14 +58,11 @@ class SignUpFragment : Fragment() {
         binding.signUpButton.setOnClickListener {
             clearErrorFields()
             binding.signUpButton.isEnabled = false
-            val login = binding.emailEditText.text?.toString() ?: return@setOnClickListener
-            val password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener
-            credentialsStorage.login = login
-            credentialsStorage.password = password
+
             signUpInteractor.onSignUpClick(
                 email = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
-                login = login,
-                password = password,
+                login = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
+                password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener,
                 name = binding.firstnameEditText.text?.toString() ?: return@setOnClickListener,
                 surname = binding.lastnameEditText.text?.toString() ?: return@setOnClickListener,
             )

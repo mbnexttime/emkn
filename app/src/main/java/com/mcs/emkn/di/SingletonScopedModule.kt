@@ -5,8 +5,6 @@ import androidx.room.Room
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.core.RouterImpl
 import com.mcs.emkn.database.Database
-import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorage
-import com.mcs.emkn.ui.utils.credentialsstorage.UiCredentialsStorageImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,11 +31,5 @@ class SingletonScopedModule {
             application.applicationContext,
             Database::class.java, "emkn-database"
         ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideCredentialsStorage() : UiCredentialsStorage {
-        return UiCredentialsStorageImpl()
     }
 }
