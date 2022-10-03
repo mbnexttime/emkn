@@ -10,7 +10,9 @@ import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -110,10 +112,9 @@ class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    override fun loadTimer() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
-            _timerFlow.emit(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
+    override fun loadTimerAsync() : Deferred<Long?> =
+        viewModelScope.async(Dispatchers.IO) {
+            val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@async null
+            attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt)
         }
-    }
 }

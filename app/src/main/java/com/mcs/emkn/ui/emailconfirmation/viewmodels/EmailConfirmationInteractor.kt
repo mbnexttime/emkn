@@ -1,5 +1,6 @@
 package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 
 interface EmailConfirmationInteractor {
@@ -16,5 +17,5 @@ interface EmailConfirmationInteractor {
 
     fun sendAnotherCode()
 
-    fun loadTimer()
+    fun loadTimerAsync() : Deferred<Long?>
 }

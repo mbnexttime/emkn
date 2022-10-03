@@ -29,12 +29,12 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChangePasswordConfirmationFragment : Fragment() {
-    private var _binding : FragmentConfirmationBinding? = null
+    private var _binding: FragmentConfirmationBinding? = null
     private val binding get() = _binding!!
 
     @Inject
     lateinit var router: Router
-    private val changePasswordInteractor: ChangePasswordInteractor by viewModels<ChangePasswordViewModel> ()
+    private val changePasswordInteractor: ChangePasswordInteractor by viewModels<ChangePasswordViewModel>()
 
     private var verificationCode: String? = null
     private var timerStarted = false
@@ -72,11 +72,12 @@ class ChangePasswordConfirmationFragment : Fragment() {
         subscribeToErrorsStatus()
         subscribeToNavStatus()
         subscribeToTimerStatus()
-        changePasswordInteractor.loadTimer()
+        loadTimer()
     }
 
     private fun setupLayout() {
-        binding.confirmationHeader.text = resources.getString(R.string.change_password_confirmation_header)
+        binding.confirmationHeader.text =
+            resources.getString(R.string.change_password_confirmation_header)
     }
 
     private fun setupCodeEditField() {
@@ -157,15 +158,26 @@ class ChangePasswordConfirmationFragment : Fragment() {
         }
     }
 
+    private fun loadTimer() {
+        lifecycleScope.launch {
+            changePasswordInteractor.loadTimerAsync().await()?.let { timer ->
+                timerStarted = true
+                binding.sendCodeAgainButton.isVisible = false
+                binding.timerTextVIew.isVisible = true
+                countDownTimer?.cancel()
+                startSendCodeTimer(timer)
+            }
+        }
+    }
+
+
     private fun subscribeToTimerStatus() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 changePasswordInteractor.timerFlow.collect { timer ->
-                    if (!timerStarted) {
-                        timerStarted = true
-                        binding.sendCodeAgainButton.isVisible = false
-                        binding.timerTextVIew.isVisible = true
-                    }
+                    timerStarted = true
+                    binding.sendCodeAgainButton.isVisible = false
+                    binding.timerTextVIew.isVisible = true
                     countDownTimer?.cancel()
                     startSendCodeTimer(timer)
                 }

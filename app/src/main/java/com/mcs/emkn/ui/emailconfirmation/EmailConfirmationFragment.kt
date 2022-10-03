@@ -76,7 +76,7 @@ class EmailConfirmationFragment : Fragment() {
         subscribeToErrorsStatus()
         subscribeToNavStatus()
 
-        emailConfirmationInteractor.loadTimer()
+        loadTimer()
     }
 
     private fun setupCodeEditField() {
@@ -157,15 +157,25 @@ class EmailConfirmationFragment : Fragment() {
         }
     }
 
+    private fun loadTimer() {
+        lifecycleScope.launch {
+            emailConfirmationInteractor.loadTimerAsync().await()?.let { timer ->
+                timerStarted = true
+                binding.sendCodeAgainButton.isVisible = false
+                binding.timerTextVIew.isVisible = true
+                countDownTimer?.cancel()
+                startSendCodeTimer(timer)
+            }
+        }
+    }
+
     private fun subscribeToTimerStatus() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 emailConfirmationInteractor.timer.collect { timer ->
-                    if (!timerStarted) {
-                        timerStarted = true
-                        binding.sendCodeAgainButton.isVisible = false
-                        binding.timerTextVIew.isVisible = true
-                    }
+                    timerStarted = true
+                    binding.sendCodeAgainButton.isVisible = false
+                    binding.timerTextVIew.isVisible = true
                     countDownTimer?.cancel()
                     startSendCodeTimer(timer)
                 }

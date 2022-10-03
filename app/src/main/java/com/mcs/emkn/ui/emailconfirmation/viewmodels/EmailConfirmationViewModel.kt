@@ -10,11 +10,9 @@ import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -77,12 +75,12 @@ class EmailConfirmationViewModel @Inject constructor(
         }
     }
 
-    override fun loadTimer() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-            _timer.emit(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
+    override fun loadTimerAsync() : Deferred<Long?> =
+        viewModelScope.async(Dispatchers.IO) {
+            val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@async null
+            attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt)
         }
-    }
+
 
 
     override fun sendAnotherCode() {

@@ -1,5 +1,6 @@
 package com.mcs.emkn.ui.changepassword.viewmodels
 
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 
 interface ChangePasswordInteractor {
@@ -16,5 +17,5 @@ interface ChangePasswordInteractor {
 
     fun sendAnotherCode()
 
-    fun loadTimer()
+    fun loadTimerAsync() : Deferred<Long?>
 }
