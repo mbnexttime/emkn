@@ -51,6 +51,7 @@ class EmailConfirmationViewModel @Inject constructor(
                 val response = api.validateEmail(ValidateEmailRequestDto(code, attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
+                        db.accountsDao().deleteCredentials()
                         db.accountsDao()
                             .putCredentials(Credentials(attempt.login, attempt.password, false))
                         db.accountsDao().deleteSignUpAttempts()

@@ -98,7 +98,7 @@ class ChangePasswordViewModel @Inject constructor(
                             db.accountsDao().deleteChangePasswordAttempts()
                             db.accountsDao().putChangePasswordAttempt(newAttempt)
                         }
-                        _timerFlow.emit(newAttempt.expiresInSeconds)
+                        _timerFlow.emit(newAttempt.expiresInSeconds * 1000)
                     }
                     is NetworkResponse.ServerError -> Unit
                     is NetworkResponse.NetworkError -> _errors.emit(ChangePasswordError.BadNetwork)
@@ -113,7 +113,7 @@ class ChangePasswordViewModel @Inject constructor(
     override fun loadTimer() {
         viewModelScope.launch(Dispatchers.IO) {
             val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
-            _timerFlow.emit(attempt.expiresInSeconds - (System.currentTimeMillis() - attempt.createdAt) / 1000)
+            _timerFlow.emit(attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt))
         }
     }
 }

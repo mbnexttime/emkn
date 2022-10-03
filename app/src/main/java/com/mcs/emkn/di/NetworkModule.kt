@@ -46,6 +46,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideApi(okHttpClient: OkHttpClient, moshi: Moshi): Api {
+        return MockApi()
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl("http://51.250.98.212:8080/")

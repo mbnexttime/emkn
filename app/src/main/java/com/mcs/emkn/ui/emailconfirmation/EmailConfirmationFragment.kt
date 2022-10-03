@@ -39,7 +39,7 @@ class EmailConfirmationFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
-    private var verificationCode: String = ""
+    private var verificationCode: String? = null
     private var timerStarted = false
     private var countDownTimer: CountDownTimer? = null
 
@@ -54,6 +54,7 @@ class EmailConfirmationFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        countDownTimer?.cancel()
         _binding = null
     }
 
@@ -63,7 +64,7 @@ class EmailConfirmationFragment : Fragment() {
             onBackButtonPressed()
         }
         binding.sendCodeButton.setOnClickListener {
-            emailConfirmationInteractor.validateCode(verificationCode)
+            verificationCode?.let { code -> emailConfirmationInteractor.validateCode(code) }
         }
         binding.sendCodeAgainButton.setOnClickListener {
             emailConfirmationInteractor.sendAnotherCode()

@@ -8,6 +8,7 @@ import com.mcs.emkn.database.entities.ChangePasswordAttempt
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.BeginChangePasswordRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class ForgotPasswordViewModel @Inject constructor(
         if (submitAtomic.get()) {
             return
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!submitAtomic.compareAndSet(false, true)) {
                 return@launch
             }
