@@ -32,7 +32,6 @@ class SignInViewModel @Inject constructor(
     private val _isLoadingFlow = MutableStateFlow(false)
     private val _navEvents = MutableSharedFlow<SignInNavEvent>()
     private val _errorsFlow = MutableSharedFlow<SignInError>()
-    private val _credentialsFlow = MutableSharedFlow<Credentials>()
     private val isLoadingAtomic = observer.isLoading
 
     override fun onSignInClick(login: String, password: String) {
