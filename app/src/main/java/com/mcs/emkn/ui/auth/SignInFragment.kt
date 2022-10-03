@@ -36,9 +36,6 @@ class SignInFragment : Fragment() {
     @Inject
     lateinit var router: Router
 
-    @Inject
-    lateinit var db: Database
-
     private val signInInteractor: SignInInteractor by viewModels<SignInViewModel>()
 
     private var isLoadingStarted = false
