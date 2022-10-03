@@ -8,16 +8,7 @@
         android:id="@+id/action_registrationNavGraph"
         app:destination="@+id/registration_graph"
         app:popUpTo="@+id/main_graph"
-        app:popUpToInclusive="true">
-        <argument
-            android:name="email"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="password"
-            app:argType="string"
-            android:defaultValue="" />
-        </action>
+        app:popUpToInclusive="true" />
 
     <action
         android:id="@+id/action_userNavGraph"

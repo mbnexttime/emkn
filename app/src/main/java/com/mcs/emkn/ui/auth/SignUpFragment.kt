@@ -61,7 +61,7 @@ class SignUpFragment : Fragment() {
 
             signUpInteractor.onSignUpClick(
                 email = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
-                login = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
+                login = binding.loginEditText.text?.toString() ?: return@setOnClickListener,
                 password = binding.passwordEditText.text?.toString() ?: return@setOnClickListener,
                 name = binding.firstnameEditText.text?.toString() ?: return@setOnClickListener,
                 surname = binding.lastnameEditText.text?.toString() ?: return@setOnClickListener,
