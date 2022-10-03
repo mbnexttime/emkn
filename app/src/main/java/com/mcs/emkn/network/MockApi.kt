@@ -12,6 +12,8 @@ import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenDto
+import com.mcs.emkn.network.dto.response.TokenAndTimeDto
+import com.mcs.emkn.network.dto.response.TokenDto
 import kotlinx.coroutines.delay
 import retrofit2.Response
 
@@ -20,7 +22,7 @@ class MockApi : Api {
         delay(1000)
         val success = true
         return if (success) NetworkResponse.Success(
-            ResponseWithTokenAndTimeDto("hdjshd", "4000000000"),
+            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
             Response.success(200, "OK")
         )
         else NetworkResponse.ServerError(
@@ -33,7 +35,19 @@ class MockApi : Api {
     }
 
     override suspend fun validateEmail(request: ValidateEmailRequestDto): NetworkResponse<Unit, ValidateEmailErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            Unit,
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            ValidateEmailErrorResponseDto(
+                ValidateEmailErrorResponseErrorsDto(
+                    NetError("1"), NetError("2")
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun accountsLogin(request: LoginRequestDto): NetworkResponse<Unit, LoginErrorResponseDto> {
@@ -50,18 +64,63 @@ class MockApi : Api {
     }
 
     override suspend fun accountsBeginChangePassword(request: BeginChangePasswordRequestDto): NetworkResponse<ResponseWithTokenAndTimeDto, BeginChangePasswordErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            BeginChangePasswordErrorResponseDto(
+                BeginChangePasswordErrorResponseErrorsDto(
+                    NetError("1")
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun accountsValidateChangePassword(request: ValidateChangePasswordRequestDto): NetworkResponse<ResponseWithTokenDto, ValidateChangePasswordErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            ResponseWithTokenDto(TokenDto( "hdjshd")),
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            ValidateChangePasswordErrorResponseDto(
+                ValidateChangePasswordErrorResponseErrorsDto(
+                    NetError("1"), null
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun accountsCommitChangePassword(request: CommitChangePasswordRequestDto): NetworkResponse<Unit, CommitChangePasswordErrorResponseDto> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            Unit,
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            CommitChangePasswordErrorResponseDto(
+                CommitChangePasswordErrorResponseErrorsDto(
+                    NetError("1"), null
+                )
+            ), response = Response.success(200, "BAD")
+        )
     }
 
     override suspend fun accountsRevalidateCredentials(request: RevalidateCredentialsDto): NetworkResponse<ResponseWithTokenAndTimeDto, Unit> {
-        TODO("Not yet implemented")
+        delay(1000)
+        val success = true
+        return if (success) NetworkResponse.Success(
+            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
+            Response.success(200, "OK")
+        )
+        else NetworkResponse.ServerError(
+            Unit
+            , response = Response.success(200, "BAD")
+        )
     }
 }

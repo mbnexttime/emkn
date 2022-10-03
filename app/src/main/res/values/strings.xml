@@ -28,9 +28,12 @@
     <string name="sign_in_back_alert_dialog_cancel_button_text">Отмена</string>
     <string name="sign_in_back_alert_dialog_ok_button_text">Ок</string>
     <string name="confirmation_back_alert_dialog_text">Код придётся вводить заново. Вы уверены?</string>
-    <string name="incorrect_login_or_email_error">Некорректный логин или пароль</string>
+    <string name="incorrect_login_or_password_error">Некорректный логин или пароль</string>
+    <string name="incorrect_login_or_email_error">Некорректный логин или почта</string>
     <string name="bad_network_error">Нет доступа к сети</string>
     <string name="incorrect_login_error">Некорректный логин</string>
     <string name="incorrect_password_error">Некорректный пароль</string>
     <string name="login_not_available_error">Логин уже занят</string>
+    <string name="code_expire_error">Срок действия кода истек</string>
+    <string name="code_invalid_error">Неверный код</string>
 </resources>

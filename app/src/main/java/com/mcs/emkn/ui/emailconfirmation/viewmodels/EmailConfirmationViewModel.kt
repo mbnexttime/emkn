@@ -1,17 +1,18 @@
 package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
+import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -34,6 +35,7 @@ class EmailConfirmationViewModel @Inject constructor(
     private val isValidatingAtomic = AtomicBoolean(false)
     private val isSendingCodeAtomic = AtomicBoolean(false)
 
+
     override fun validateCode(code: String) {
         if (isValidatingAtomic.get()) {
             return
@@ -47,6 +49,9 @@ class EmailConfirmationViewModel @Inject constructor(
                 val response = api.validateEmail(ValidateEmailRequestDto(code, attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
+                        db.accountsDao().deleteCredentials()
+                        db.accountsDao()
+                            .putCredentials(Credentials(attempt.login, attempt.password, false))
                         db.accountsDao().deleteSignUpAttempts()
                         _navEvents.emit(EmailConfirmationNavEvent.ContinueConfirmation)
                     }
@@ -70,12 +75,13 @@ class EmailConfirmationViewModel @Inject constructor(
         }
     }
 
-    override fun loadTimer() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-            _timer.emit(attempt.expiresInSeconds - (System.currentTimeMillis() - attempt.createdAt) / 1000)
+    override fun loadTimerAsync() : Deferred<Long?> =
+        viewModelScope.async(Dispatchers.IO) {
+            val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@async null
+            attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt)
         }
-    }
+
+
 
     override fun sendAnotherCode() {
         if (isSendingCodeAtomic.get()) {
@@ -87,7 +93,8 @@ class EmailConfirmationViewModel @Inject constructor(
             }
             try {
                 val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
-                val response = api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
+                val response =
+                    api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
                         val newAttempt = attempt.copy(
@@ -99,7 +106,7 @@ class EmailConfirmationViewModel @Inject constructor(
                             db.accountsDao().deleteSignUpAttempts()
                             db.accountsDao().putSignUpAttempt(newAttempt)
                         }
-                        _timer.emit(newAttempt.expiresInSeconds)
+                        _timer.emit(newAttempt.expiresInSeconds * 1000)
                     }
                     is NetworkResponse.ServerError -> Unit
                     is NetworkResponse.NetworkError -> _errors.emit(EmailConfirmationError.BadNetwork)

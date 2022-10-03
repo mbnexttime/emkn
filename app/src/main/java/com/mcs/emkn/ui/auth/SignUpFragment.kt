@@ -58,6 +58,7 @@ class SignUpFragment : Fragment() {
         binding.signUpButton.setOnClickListener {
             clearErrorFields()
             binding.signUpButton.isEnabled = false
+
             signUpInteractor.onSignUpClick(
                 email = binding.emailEditText.text?.toString() ?: return@setOnClickListener,
                 login = binding.loginEditText.text?.toString() ?: return@setOnClickListener,

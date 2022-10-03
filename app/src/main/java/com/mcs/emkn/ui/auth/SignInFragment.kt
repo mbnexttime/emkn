@@ -2,7 +2,6 @@ package com.mcs.emkn.ui.auth
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +16,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
+import com.mcs.emkn.database.Database
 import com.mcs.emkn.databinding.FragmentSignInBinding
 import com.mcs.emkn.ui.auth.viewmodels.SignInError
 import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
 import com.mcs.emkn.ui.auth.viewmodels.SignInNavEvent
 import com.mcs.emkn.ui.auth.viewmodels.SignInViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,10 +71,20 @@ class SignInFragment : Fragment() {
             onBackButtonPressed()
             this.isEnabled = true
         }
-
         subscribeToLoadingStatus()
         subscribeToErrorsStatus()
         subscribeToNavStatus()
+
+        insertLoginPassword()
+    }
+
+    private fun insertLoginPassword() {
+        lifecycleScope.launch {
+            signInInteractor.loadCredentialsAsync().await()?.let { credentials ->
+                binding.loginEditText.setText(credentials.login)
+                binding.passwordEditText.setText(credentials.password)
+            }
+        }
     }
 
     private fun decideSignInButtonEnabledState(login: String?, password: String?) {
@@ -156,7 +168,7 @@ class SignInFragment : Fragment() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 signInInteractor.navEvents.collect { navEvent ->
-                    when(navEvent) {
+                    when (navEvent) {
                         is SignInNavEvent.ContinueSignIn -> {
                             router.goToUserNavGraph()
                         }

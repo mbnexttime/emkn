@@ -1,6 +1,7 @@
 package com.mcs.emkn.ui.auth.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
@@ -8,11 +9,10 @@ import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.LoginRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,6 +27,7 @@ class SignInViewModel @Inject constructor(
         get() = _errorsFlow
     override val navEvents: Flow<SignInNavEvent>
         get() = _navEvents
+
 
     private val _isLoadingFlow = MutableStateFlow(false)
     private val _navEvents = MutableSharedFlow<SignInNavEvent>()
@@ -47,7 +48,7 @@ class SignInViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         db.runInTransaction {
                             db.clearAllTables()
-                            db.accountsDao().putCredentials(Credentials(login, password))
+                            db.accountsDao().putCredentials(Credentials(login, password, true))
                         }
                         _navEvents.emit(SignInNavEvent.ContinueSignIn)
                     }
@@ -68,4 +69,9 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
+
+    override fun loadCredentialsAsync() : Deferred<Credentials?> =
+        viewModelScope.async(Dispatchers.IO) {
+            db.accountsDao().getCredentials().firstOrNull()
+        }
 }

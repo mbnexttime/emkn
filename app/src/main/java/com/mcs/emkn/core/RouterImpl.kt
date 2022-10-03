@@ -6,13 +6,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RouterImpl @Inject constructor(): Router {
+class RouterImpl @Inject constructor() : Router {
     private var navController: NavController? = null
-    
+
     fun attachNavController(navController: NavController) {
         this.navController = navController
     }
-    
+
     fun releaseNavController() {
         this.navController = null
     }
@@ -23,26 +23,38 @@ class RouterImpl @Inject constructor(): Router {
     }
 
     override fun goToEmailConfirmationScreen() {
-        navController?.navigate(R.id.action_authFragment_to_emailConfirmationFragment)
+        try {
+            navController?.navigate(R.id.action_authFragment_to_emailConfirmationFragment)
+        } catch (_: Throwable) { }
     }
 
     override fun goToForgotPasswordScreen() {
-        navController?.navigate(R.id.action_authFragment_to_forgotPasswordFragment)
+        try {
+            navController?.navigate(R.id.action_authFragment_to_forgotPasswordFragment)
+        } catch(_: Throwable) { }
     }
 
     override fun goToChangePasswordConfirmationScreen() {
-        navController?.navigate(R.id.action_forgotPasswordFragment_to_changePasswordConfirmationFragment)
+        try {
+            navController?.navigate(R.id.action_forgotPasswordFragment_to_changePasswordConfirmationFragment)
+        } catch(_: Throwable) { }
     }
 
     override fun goToCommitChangePasswordScreen() {
-        navController?.navigate(R.id.action_changePasswordConfirmationFragment_to_commitChangePasswordFragment)
+        try {
+            navController?.navigate(R.id.action_changePasswordConfirmationFragment_to_commitChangePasswordFragment)
+        } catch(_: Throwable) { }
     }
 
     override fun goToRegistrationNavGraph() {
-        navController?.navigate(R.id.action_registrationNavGraph)
+        try {
+            navController?.navigate(R.id.action_registrationNavGraph)
+        } catch(_: Throwable) { }
     }
 
     override fun goToUserNavGraph() {
-        navController?.navigate(R.id.action_userNavGraph)
+        try {
+            navController?.navigate(R.id.action_userNavGraph)
+        } catch(_: Throwable) { }
     }
 }

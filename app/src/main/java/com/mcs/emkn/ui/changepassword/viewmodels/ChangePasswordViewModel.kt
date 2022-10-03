@@ -10,7 +10,9 @@ import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -52,7 +54,7 @@ class ChangePasswordViewModel @Inject constructor(
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordCommits()
                             db.accountsDao()
-                                .putChangePasswordCommit(ChangePasswordCommit(response.body.changePasswordToken))
+                                .putChangePasswordCommit(ChangePasswordCommit(response.body.token.changePasswordToken))
                         }
                         _navEvents.emit(ChangePasswordNavEvent.ContinueChangePassword)
                     }
@@ -90,15 +92,15 @@ class ChangePasswordViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         val newAttempt = ChangePasswordAttempt(
                             credentials = attempt.credentials,
-                            randomToken = response.body.randomToken,
-                            expiresInSeconds = response.body.expiresIn.toLong(),
+                            randomToken = response.body.tokenAndTimeDto.randomToken,
+                            expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
                             createdAt = System.currentTimeMillis(),
                         )
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordAttempts()
                             db.accountsDao().putChangePasswordAttempt(newAttempt)
                         }
-                        _timerFlow.emit(newAttempt.expiresInSeconds)
+                        _timerFlow.emit(newAttempt.expiresInSeconds * 1000)
                     }
                     is NetworkResponse.ServerError -> Unit
                     is NetworkResponse.NetworkError -> _errors.emit(ChangePasswordError.BadNetwork)
@@ -110,10 +112,9 @@ class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    override fun loadTimer() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
-            _timerFlow.emit(attempt.expiresInSeconds - (System.currentTimeMillis() - attempt.createdAt) / 1000)
+    override fun loadTimerAsync() : Deferred<Long?> =
+        viewModelScope.async(Dispatchers.IO) {
+            val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@async null
+            attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt)
         }
-    }
 }
