@@ -35,6 +35,7 @@ class SignInFragment : Fragment() {
 
     @Inject
     lateinit var router: Router
+
     @Inject
     lateinit var db: Database
 
@@ -73,17 +74,16 @@ class SignInFragment : Fragment() {
             onBackButtonPressed()
             this.isEnabled = true
         }
-        insertLoginPassword()
-
         subscribeToLoadingStatus()
         subscribeToErrorsStatus()
         subscribeToNavStatus()
+
+        insertLoginPassword()
     }
 
     private fun insertLoginPassword() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val credentials = db.accountsDao().getCredentials().firstOrNull() ?:return@launch
-            withContext(Dispatchers.Main) {
+        lifecycleScope.launch {
+            signInInteractor.loadCredentialsAsync().await()?.let { credentials ->
                 binding.loginEditText.setText(credentials.login)
                 binding.passwordEditText.setText(credentials.password)
             }
@@ -171,7 +171,7 @@ class SignInFragment : Fragment() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 signInInteractor.navEvents.collect { navEvent ->
-                    when(navEvent) {
+                    when (navEvent) {
                         is SignInNavEvent.ContinueSignIn -> {
                             router.goToUserNavGraph()
                         }
