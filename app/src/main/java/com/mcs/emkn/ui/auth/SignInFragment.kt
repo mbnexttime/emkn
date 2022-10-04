@@ -16,16 +16,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
-import com.mcs.emkn.database.Database
 import com.mcs.emkn.databinding.FragmentSignInBinding
 import com.mcs.emkn.ui.auth.viewmodels.SignInError
 import com.mcs.emkn.ui.auth.viewmodels.SignInInteractor
 import com.mcs.emkn.ui.auth.viewmodels.SignInNavEvent
 import com.mcs.emkn.ui.auth.viewmodels.SignInViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -135,6 +132,10 @@ class SignInFragment : Fragment() {
                 signInInteractor.isLoadingFlow.collect { isLoading ->
                     binding.progressBar.isVisible = isLoading
                     isLoadingStarted = isLoading
+                    decideSignInButtonEnabledState(
+                        login = binding.loginEditText.text?.toString(),
+                        password = binding.passwordEditText.text?.toString()
+                    )
                 }
             }
         }
