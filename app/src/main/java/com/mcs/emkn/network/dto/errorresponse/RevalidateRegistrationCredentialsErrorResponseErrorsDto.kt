@@ -4,8 +4,7 @@ import com.mcs.emkn.network.dto.error.NetError
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-
 @JsonClass(generateAdapter = true)
-data class LoginErrorResponseErrorsDto(
-    @Json(name = "invalid_login_or_password") val invalidLoginOrPassword: NetError?,
+data class RevalidateRegistrationCredentialsErrorResponseErrorsDto(
+    @Json(name = "invalid_registration_revalidation") val invalidRegistrationRevalidation: NetError?,
 )

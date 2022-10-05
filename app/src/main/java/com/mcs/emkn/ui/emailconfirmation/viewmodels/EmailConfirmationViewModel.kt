@@ -1,6 +1,5 @@
 package com.mcs.emkn.ui.emailconfirmation.viewmodels
 
-import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
@@ -10,9 +9,12 @@ import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -62,7 +64,7 @@ class EmailConfirmationViewModel @Inject constructor(
                                 _errors.emit(EmailConfirmationError.InvalidCode)
                             }
                             if (errorsBody.errors.registrationExpired != null) {
-                                _errors.emit(EmailConfirmationError.CodeExpired)
+                                _errors.emit(EmailConfirmationError.RegistrationExpired)
                             }
                         }
                     }
@@ -94,7 +96,7 @@ class EmailConfirmationViewModel @Inject constructor(
             try {
                 val attempt = db.accountsDao().getSignUpAttempts().firstOrNull() ?: return@launch
                 val response =
-                    api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))
+                    api.accountsRevalidateRegistrationCredentials(RevalidateCredentialsDto(attempt.randomToken))
                 when (response) {
                     is NetworkResponse.Success -> {
                         val newAttempt = attempt.copy(
@@ -108,7 +110,14 @@ class EmailConfirmationViewModel @Inject constructor(
                         }
                         _timer.emit(newAttempt.expiresInSeconds * 1000)
                     }
-                    is NetworkResponse.ServerError -> Unit
+                    is NetworkResponse.ServerError -> {
+                        val errorBody = response.body
+                        if (errorBody != null) {
+                            if (errorBody.errors.invalidRegistrationRevalidation != null) {
+                                _errors.emit(EmailConfirmationError.RegistrationExpired)
+                            }
+                        }
+                    }
                     is NetworkResponse.NetworkError -> _errors.emit(EmailConfirmationError.BadNetwork)
                     is NetworkResponse.UnknownError -> Unit
                 }

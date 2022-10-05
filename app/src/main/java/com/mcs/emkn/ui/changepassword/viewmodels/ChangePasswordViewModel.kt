@@ -88,7 +88,8 @@ class ChangePasswordViewModel @Inject constructor(
             }
             try {
                 val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
-                when (val response = api.accountsRevalidateCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
+                when (val response =
+                    api.accountsRevalidateRegistrationCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
                     is NetworkResponse.Success -> {
                         val newAttempt = ChangePasswordAttempt(
                             credentials = attempt.credentials,

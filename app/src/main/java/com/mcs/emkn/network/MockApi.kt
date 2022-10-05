@@ -2,7 +2,19 @@ package com.mcs.emkn.network
 
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.network.dto.error.NetError
-import com.mcs.emkn.network.dto.errorresponse.*
+import com.mcs.emkn.network.dto.errorresponse.BeginChangePasswordErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.BeginChangePasswordErrorResponseErrorsDto
+import com.mcs.emkn.network.dto.errorresponse.CommitChangePasswordErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.CommitChangePasswordErrorResponseErrorsDto
+import com.mcs.emkn.network.dto.errorresponse.LoginErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.LoginErrorResponseErrorsDto
+import com.mcs.emkn.network.dto.errorresponse.RegistrationErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.RegistrationErrorResponseErrorsDto
+import com.mcs.emkn.network.dto.errorresponse.RevalidateRegistrationCredentialsErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.ValidateChangePasswordErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.ValidateChangePasswordErrorResponseErrorsDto
+import com.mcs.emkn.network.dto.errorresponse.ValidateEmailErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.ValidateEmailErrorResponseErrorsDto
 import com.mcs.emkn.network.dto.request.BeginChangePasswordRequestDto
 import com.mcs.emkn.network.dto.request.CommitChangePasswordRequestDto
 import com.mcs.emkn.network.dto.request.LoginRequestDto
@@ -111,16 +123,9 @@ class MockApi : Api {
         )
     }
 
-    override suspend fun accountsRevalidateCredentials(request: RevalidateCredentialsDto): NetworkResponse<ResponseWithTokenAndTimeDto, Unit> {
+    override suspend fun accountsRevalidateRegistrationCredentials(request: RevalidateCredentialsDto):
+        NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto> {
         delay(1000)
-        val success = true
-        return if (success) NetworkResponse.Success(
-            ResponseWithTokenAndTimeDto(TokenAndTimeDto( "5", "hdjshd")),
-            Response.success(200, "OK")
-        )
-        else NetworkResponse.ServerError(
-            Unit
-            , response = Response.success(200, "BAD")
-        )
+        TODO()
     }
 }

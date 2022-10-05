@@ -157,7 +157,7 @@ class SignInFragment : Fragment() {
                         }
                         is SignInError.IncorrectLoginOrPassword -> {
                             binding.underPasswordTextView.text =
-                                resources.getString(R.string.incorrect_login_or_email_error)
+                                resources.getString(R.string.incorrect_login_or_password_error)
                         }
                     }
                 }

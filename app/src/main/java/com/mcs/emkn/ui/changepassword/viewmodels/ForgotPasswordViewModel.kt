@@ -57,8 +57,8 @@ class ForgotPasswordViewModel @Inject constructor(
                     is NetworkResponse.ServerError -> {
                         val errorsBody = response.body
                         if (errorsBody != null) {
-                            if (errorsBody.errors.invalidLoginOrEmail != null) {
-                                _errors.emit(ForgotPasswordError.InvalidLoginOrEmail)
+                            if (errorsBody.errors.illegalEmail != null) {
+                                _errors.emit(ForgotPasswordError.InvalidEmail)
                             }
                         }
                     }

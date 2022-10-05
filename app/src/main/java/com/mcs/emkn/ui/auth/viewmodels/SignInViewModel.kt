@@ -1,7 +1,6 @@
 package com.mcs.emkn.ui.auth.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
@@ -9,10 +8,13 @@ import com.mcs.emkn.database.entities.Credentials
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.LoginRequestDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +57,7 @@ class SignInViewModel @Inject constructor(
                     is NetworkResponse.ServerError -> {
                         val errorsBody = response.body
                         if (errorsBody != null) {
-                            if (errorsBody.errors.illegalLoginOrEmail != null) {
+                            if (errorsBody.errors.invalidLoginOrPassword != null) {
                                 _errorsFlow.emit(SignInError.IncorrectLoginOrPassword)
                             }
                         }

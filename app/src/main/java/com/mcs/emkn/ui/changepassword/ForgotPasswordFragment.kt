@@ -113,9 +113,9 @@ class ForgotPasswordFragment : Fragment() {
                                 )
                                 .show()
                         }
-                        is ForgotPasswordError.InvalidLoginOrEmail -> {
+                        is ForgotPasswordError.InvalidEmail -> {
                             binding.underEditTextTextView.text =
-                                resources.getString(R.string.incorrect_login_or_email_error)
+                                resources.getString(R.string.incorrect_email_error)
                         }
                     }
                 }

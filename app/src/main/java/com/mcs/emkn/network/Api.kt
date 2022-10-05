@@ -5,6 +5,7 @@ import com.mcs.emkn.network.dto.errorresponse.BeginChangePasswordErrorResponseDt
 import com.mcs.emkn.network.dto.errorresponse.CommitChangePasswordErrorResponseDto
 import com.mcs.emkn.network.dto.errorresponse.LoginErrorResponseDto
 import com.mcs.emkn.network.dto.errorresponse.RegistrationErrorResponseDto
+import com.mcs.emkn.network.dto.errorresponse.RevalidateRegistrationCredentialsErrorResponseDto
 import com.mcs.emkn.network.dto.errorresponse.ValidateChangePasswordErrorResponseDto
 import com.mcs.emkn.network.dto.errorresponse.ValidateEmailErrorResponseDto
 import com.mcs.emkn.network.dto.request.BeginChangePasswordRequestDto
@@ -50,8 +51,8 @@ interface Api {
         @Body request: CommitChangePasswordRequestDto
     ): NetworkResponse<Unit, CommitChangePasswordErrorResponseDto>
 
-    @POST("accounts/revalidateCredentials")
-    suspend fun accountsRevalidateCredentials(
+    @POST("accounts/revalidate_registration_credentials")
+    suspend fun accountsRevalidateRegistrationCredentials(
         @Body request: RevalidateCredentialsDto,
-    ): NetworkResponse<ResponseWithTokenAndTimeDto, Unit>
+    ): NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto>
 }

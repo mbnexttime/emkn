@@ -7,6 +7,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class BeginChangePasswordErrorResponseErrorsDto(
-    @Json(name = "invalid_login_or_email") val invalidLoginOrEmail: NetError?,
+    @Json(name = "illegal_email") val illegalEmail: NetError?,
 )
 

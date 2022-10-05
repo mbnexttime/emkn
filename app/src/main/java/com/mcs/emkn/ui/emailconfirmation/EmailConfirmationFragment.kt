@@ -7,21 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.databinding.FragmentConfirmationBinding
-import com.mcs.emkn.ui.auth.viewmodels.SignUpError
-import com.mcs.emkn.ui.auth.viewmodels.SignUpNavEvent
 import com.mcs.emkn.ui.emailconfirmation.viewmodels.EmailConfirmationError
 import com.mcs.emkn.ui.emailconfirmation.viewmodels.EmailConfirmationInteractor
 import com.mcs.emkn.ui.emailconfirmation.viewmodels.EmailConfirmationNavEvent
@@ -119,14 +113,8 @@ class EmailConfirmationFragment : Fragment() {
                                 )
                                 .show()
                         }
-                        is EmailConfirmationError.CodeExpired -> {
-                            Toast
-                                .makeText(
-                                    requireContext(),
-                                    resources.getString(R.string.code_expire_error),
-                                    Toast.LENGTH_LONG
-                                )
-                                .show()
+                        is EmailConfirmationError.RegistrationExpired -> {
+                            router.back()
                         }
                         is EmailConfirmationError.InvalidCode -> {
                             Toast
