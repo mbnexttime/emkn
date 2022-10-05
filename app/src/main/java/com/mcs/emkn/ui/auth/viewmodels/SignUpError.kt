@@ -5,4 +5,5 @@ sealed class SignUpError {
     object IllegalLogin : SignUpError()
     object IllegalPassword : SignUpError()
     object LoginIsNotAvailable : SignUpError()
+    object EmailIsNotAvailable : SignUpError()
 }

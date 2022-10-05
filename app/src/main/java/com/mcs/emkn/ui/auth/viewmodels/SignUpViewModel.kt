@@ -84,6 +84,9 @@ class SignUpViewModel @Inject constructor(
                             if (errorsBody.errors.loginIsNotAvailable != null) {
                                 _errorsFlow.emit(SignUpError.LoginIsNotAvailable)
                             }
+                            if (errorsBody.errors.emailIsNotAvailable != null) {
+                                _errorsFlow.emit(SignUpError.EmailIsNotAvailable)
+                            }
                         }
                     }
                     is NetworkResponse.NetworkError -> _errorsFlow.emit(SignUpError.BadNetwork)

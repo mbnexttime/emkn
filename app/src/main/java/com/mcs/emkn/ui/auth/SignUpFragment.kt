@@ -191,6 +191,10 @@ class SignUpFragment : Fragment() {
                             binding.underLoginTextView.text =
                                 resources.getString(R.string.login_not_available_error)
                         }
+                        is SignUpError.EmailIsNotAvailable -> {
+                            binding.underEmailTextView.text =
+                                resources.getString(R.string.email_not_available_error)
+                        }
                     }
                 }
             }
@@ -214,5 +218,6 @@ class SignUpFragment : Fragment() {
     private fun clearErrorFields() {
         binding.underPasswordTextView.text = ""
         binding.underLoginTextView.text = ""
+        binding.underEmailTextView.text = ""
     }
 }
