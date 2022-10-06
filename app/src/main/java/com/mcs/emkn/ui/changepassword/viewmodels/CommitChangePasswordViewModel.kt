@@ -47,7 +47,10 @@ class CommitChangePasswordViewModel @Inject constructor(
                 )
                 when (response) {
                     is NetworkResponse.Success -> {
-                        database.accountsDao().deleteChangePasswordCommits()
+                        database.runInTransaction {
+                            database.accountsDao().deleteCredentials()
+                            database.accountsDao().deleteChangePasswordCommits()
+                        }
                         _navEvents.emit(CommitChangePasswordNavEvent.ContinueChangePassword)
                     }
                     is NetworkResponse.ServerError -> {

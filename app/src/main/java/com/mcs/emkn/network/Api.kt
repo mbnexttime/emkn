@@ -16,7 +16,7 @@ import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
 import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
 import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
 import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
-import com.mcs.emkn.network.dto.response.ResponseWithTokenDto
+import com.mcs.emkn.network.dto.response.TokenDto
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -44,7 +44,7 @@ interface Api {
     @POST("accounts/validate_change_password")
     suspend fun accountsValidateChangePassword(
         @Body request: ValidateChangePasswordRequestDto
-    ): NetworkResponse<ResponseWithTokenDto, ValidateChangePasswordErrorResponseDto>
+    ): NetworkResponse<TokenDto, ValidateChangePasswordErrorResponseDto>
 
     @POST("accounts/commit_change_password")
     suspend fun accountsCommitChangePassword(
@@ -53,6 +53,11 @@ interface Api {
 
     @POST("accounts/revalidate_registration_credentials")
     suspend fun accountsRevalidateRegistrationCredentials(
+        @Body request: RevalidateCredentialsDto,
+    ): NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto>
+
+    @POST("accounts/revalidate_change_password_credentials")
+    suspend fun accountsRevalidateChangePasswordCredentials(
         @Body request: RevalidateCredentialsDto,
     ): NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto>
 }

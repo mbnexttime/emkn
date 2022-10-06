@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class BeginChangePasswordRequestDto(
-    @Json(name = "credentials") val credentials: String,
+    @Json(name = "email") val email: String,
 )

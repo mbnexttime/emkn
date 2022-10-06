@@ -54,7 +54,7 @@ class ChangePasswordViewModel @Inject constructor(
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordCommits()
                             db.accountsDao()
-                                .putChangePasswordCommit(ChangePasswordCommit(response.body.token.changePasswordToken))
+                                .putChangePasswordCommit(ChangePasswordCommit(response.body.changePasswordToken))
                         }
                         _navEvents.emit(ChangePasswordNavEvent.ContinueChangePassword)
                     }
@@ -89,7 +89,7 @@ class ChangePasswordViewModel @Inject constructor(
             try {
                 val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@launch
                 when (val response =
-                    api.accountsRevalidateRegistrationCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
+                    api.accountsRevalidateChangePasswordCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
                     is NetworkResponse.Success -> {
                         val newAttempt = ChangePasswordAttempt(
                             credentials = attempt.credentials,
@@ -113,7 +113,7 @@ class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    override fun loadTimerAsync() : Deferred<Long?> =
+    override fun loadTimerAsync(): Deferred<Long?> =
         viewModelScope.async(Dispatchers.IO) {
             val attempt = db.accountsDao().getChangePasswordAttempts().firstOrNull() ?: return@async null
             attempt.expiresInSeconds * 1000 - (System.currentTimeMillis() - attempt.createdAt)
