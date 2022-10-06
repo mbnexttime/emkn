@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
-import com.mcs.emkn.database.entities.ChangePasswordAttempt
 import com.mcs.emkn.database.entities.ChangePasswordCommit
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
@@ -91,12 +90,7 @@ class ChangePasswordViewModel @Inject constructor(
                 when (val response =
                     api.accountsRevalidateChangePasswordCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
                     is NetworkResponse.Success -> {
-                        val newAttempt = ChangePasswordAttempt(
-                            credentials = attempt.credentials,
-                            randomToken = response.body.tokenAndTimeDto.randomToken,
-                            expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
-                            createdAt = System.currentTimeMillis(),
-                        )
+                        val newAttempt = attempt.copy(createdAt = System.currentTimeMillis())
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordAttempts()
                             db.accountsDao().putChangePasswordAttempt(newAttempt)

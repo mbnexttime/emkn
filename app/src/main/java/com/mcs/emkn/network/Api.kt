@@ -1,20 +1,8 @@
 package com.mcs.emkn.network
 
 import com.haroldadmin.cnradapter.NetworkResponse
-import com.mcs.emkn.network.dto.errorresponse.BeginChangePasswordErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.CommitChangePasswordErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.LoginErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.RegistrationErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.RevalidateRegistrationCredentialsErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.ValidateChangePasswordErrorResponseDto
-import com.mcs.emkn.network.dto.errorresponse.ValidateEmailErrorResponseDto
-import com.mcs.emkn.network.dto.request.BeginChangePasswordRequestDto
-import com.mcs.emkn.network.dto.request.CommitChangePasswordRequestDto
-import com.mcs.emkn.network.dto.request.LoginRequestDto
-import com.mcs.emkn.network.dto.request.RegistrationRequestDto
-import com.mcs.emkn.network.dto.request.RevalidateCredentialsDto
-import com.mcs.emkn.network.dto.request.ValidateChangePasswordRequestDto
-import com.mcs.emkn.network.dto.request.ValidateEmailRequestDto
+import com.mcs.emkn.network.dto.errorresponse.*
+import com.mcs.emkn.network.dto.request.*
 import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
 import com.mcs.emkn.network.dto.response.TokenDto
 import retrofit2.http.Body
@@ -59,5 +47,5 @@ interface Api {
     @POST("accounts/revalidate_change_password_credentials")
     suspend fun accountsRevalidateChangePasswordCredentials(
         @Body request: RevalidateCredentialsDto,
-    ): NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto>
+    ): NetworkResponse<Unit, RevalidateRegistrationCredentialsErrorResponseDto>
 }
