@@ -34,7 +34,7 @@
     <string name="incorrect_login_error">Некорректный логин</string>
     <string name="incorrect_password_error">Некорректный пароль</string>
     <string name="login_not_available_error">Логин уже занят</string>
-    <string name="email_not_available_error">Логин уже занят</string>
+    <string name="email_not_available_error">Email уже занят</string>
     <string name="code_expire_error">Срок действия кода истек</string>
     <string name="code_invalid_error">Неверный код</string>
 </resources>
