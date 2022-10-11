@@ -37,4 +37,9 @@
     <string name="email_not_available_error">Email уже занят</string>
     <string name="code_expire_error">Срок действия кода истек</string>
     <string name="code_invalid_error">Неверный код</string>
+    <string name="enroll_button">Записаться</string>
+    <string name="unenroll_button">Отписаться</string>
+    <string name="courses_title">курсы</string>
+    <string name="exclude_enroll_courses">исключить пройденные курсы</string>
+    <string name="exclude_unenrolled_courses">исключить непройденные курсы</string>
 </resources>

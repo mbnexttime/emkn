@@ -19,6 +19,7 @@
     <include app:graph="@navigation/registration_graph" />
 
     <include app:graph="@navigation/user_graph" />
+
     <fragment
         android:id="@+id/startPageFragment"
         android:name="com.mcs.emkn.ui.startpage.StartPageFragment"

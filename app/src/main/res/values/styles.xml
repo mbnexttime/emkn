@@ -15,19 +15,19 @@
         <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="AuthConfirmButton">
+    <style name="ConfirmButton">
         <item name="android:paddingVertical">5dp</item>
-        <item name="android:background">@drawable/auth_confirm_background</item>
+        <item name="android:background">@drawable/confirm_background</item>
         <item name="android:paddingHorizontal">16dp</item>
         <item name="android:textColor">@color/text_reversed</item>
         <item name="android:minWidth">220dp</item>
         <item name="android:textSize">20dp</item>
     </style>
 
-    <style name="AuthDeclineButton">
+    <style name="DeclineButton">
         <item name="android:paddingVertical">5dp</item>
         <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:background">@drawable/auth_decline_background</item>
+        <item name="android:background">@drawable/decline_background</item>
         <item name="android:textColor">@color/text</item>
         <item name="android:minWidth">160dp</item>
         <item name="android:textSize">20dp</item>

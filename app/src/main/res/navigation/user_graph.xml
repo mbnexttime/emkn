@@ -2,10 +2,15 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/user_graph"
-    app:startDestination="@id/tasksFragment">
+    app:startDestination="@id/coursesFragment">
 
     <fragment
         android:id="@+id/tasksFragment"
         android:name="com.mcs.emkn.ui.tasks.TasksFragment"
         android:label="TasksFragment" />
+
+    <fragment
+        android:id="@+id/coursesFragment"
+        android:name="com.mcs.emkn.ui.courses.CoursesFragment"
+        android:label="CoursesFragment" />
 </navigation>

@@ -78,7 +78,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sendCodeButton"
-        style="@style/AuthConfirmButton"
+        style="@style/ConfirmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
@@ -89,7 +89,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sendCodeAgainButton"
-        style="@style/AuthDeclineButton"
+        style="@style/DeclineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
