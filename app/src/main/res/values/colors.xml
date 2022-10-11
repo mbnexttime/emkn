@@ -13,8 +13,11 @@
 
     <color name="accent">#F2BF52</color>
     <color name="accent_50">#7FF2BF52</color>
+    <color name="accent_15">#26F2BF52</color>
     <color name="confirm">#5A59F2</color>
     <color name="confirm_50">#7F5A59F2</color>
+    <color name="confirm_20">#335A59F2</color>
+    <color name="confirm_20_no_t">#DEDEFC</color>
     <color name="text">#000000</color>
     <color name="text_50">#7F000000</color>
     <color name="text_reversed">#FFFFFF</color>
