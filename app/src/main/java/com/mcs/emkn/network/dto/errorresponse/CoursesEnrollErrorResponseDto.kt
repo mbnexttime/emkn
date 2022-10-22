@@ -7,6 +7,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CoursesEnrollErrorResponseDto (
-    @Json(name = "already_enrolled") val alreadyEnrolled: NetError,
-    @Json(name = "invalid_course_id") val invalidCourseId: NetError
+    @Json(name = "already_enrolled") val alreadyEnrolled: NetError?,
+    @Json(name = "invalid_course_id") val invalidCourseId: NetError?
 )

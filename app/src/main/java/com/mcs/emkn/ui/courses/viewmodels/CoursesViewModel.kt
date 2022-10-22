@@ -1,31 +1,30 @@
 package com.mcs.emkn.ui.courses.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.core.State
 import com.mcs.emkn.database.Database
 import com.mcs.emkn.database.entities.CheckBoxesStateEntity
-import com.mcs.emkn.network.Api
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 import com.mcs.emkn.database.entities.CourseEntity
 import com.mcs.emkn.database.entities.PeriodEntity
 import com.mcs.emkn.database.entities.ProfileEntity
+import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.CoursesEnrollUnenrollRequestDto
 import com.mcs.emkn.network.dto.request.CoursesListRequestDto
 import com.mcs.emkn.network.dto.request.ProfilesGetRequestDto
 import com.mcs.emkn.network.dto.response.PeriodCoursesDto
 import com.mcs.emkn.network.dto.response.PeriodDto
 import com.mcs.emkn.network.dto.response.ProfileDto
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 @HiltViewModel
 class CoursesViewModel @Inject constructor(
@@ -36,13 +35,16 @@ class CoursesViewModel @Inject constructor(
         get() = _coursesFlow
     override val periods: Flow<State<PeriodsData>>
         get() = _periodsFlow
-    override val navEvents: Flow<CoursesNavEvents>
+    override val navEventsFlow: Flow<CoursesNavEvents>
         get() = _navEvents
+    override val errorsFlow: Flow<CoursesError>
+        get() = _errorsFlow
 
     private val _coursesFlow = MutableSharedFlow<State<Map<Int, List<Course>>>>()
     private val _periodsFlow = MutableSharedFlow<State<PeriodsData>>()
     private val _navEvents = MutableSharedFlow<CoursesNavEvents>()
-    private val IsLoadingAtomic = AtomicBoolean(false)
+    private val _errorsFlow = MutableSharedFlow<CoursesError>()
+    private val isLoadingAtomic = AtomicBoolean(false)
 
     private var coursesStorage: MutableMap<Int, List<CourseEntity>>? = null
     private var periodsStorage: MutableMap<Int, PeriodEntity>? = null
@@ -64,7 +66,8 @@ class CoursesViewModel @Inject constructor(
         }
         updatePeriodsCheckedStateInDb(idsNeededForUpdate)
         val chosenIdsSet = if (periodIds.isNotEmpty()) periodIds.toSet() else setOf(defaultPeriodId)
-        val idsNeededForLoading = (chosenIdsSet - (coursesStorage?.keys ?: setOf())).toList()
+        val idsNeededForLoading =
+            (chosenIdsSet - (coursesStorage?.keys ?: setOf()).toSet()).toList()
 
         viewModelScope.launch {
             if (idsNeededForLoading.isNotEmpty())
@@ -90,11 +93,11 @@ class CoursesViewModel @Inject constructor(
     }
 
     override fun loadPeriods() {
-        if (IsLoadingAtomic.get())
+        if (isLoadingAtomic.get())
             return
         viewModelScope.launch(Dispatchers.IO) {
             if (periodsStorage == null) {
-                if (!IsLoadingAtomic.compareAndSet(false, true))
+                if (!isLoadingAtomic.compareAndSet(false, true))
                     return@launch
                 _periodsFlow.emit(State(null, true))
                 loadPeriodsFromDb()
@@ -104,15 +107,32 @@ class CoursesViewModel @Inject constructor(
                             updatePeriodsInDb(response.body.periods)
                         }
                         is NetworkResponse.ServerError -> {
-
+                            _errorsFlow.emit(
+                                CoursesError.UnknownError(
+                                    coursesPeriodsUnknownErrorDefaultMessage
+                                )
+                            )
                         }
-                        is NetworkResponse.NetworkError -> {}
-                        is NetworkResponse.UnknownError -> {}
+                        is NetworkResponse.NetworkError -> {
+                            _errorsFlow.emit(CoursesError.NetworkError)
+                        }
+                        is NetworkResponse.UnknownError -> {
+                            _errorsFlow.emit(
+                                CoursesError.UnknownError(
+                                    response.error.message
+                                        ?: coursesPeriodsUnknownErrorDefaultMessage
+                                )
+                            )
+                        }
                     }
                 } catch (e: Throwable) {
-
+                    _errorsFlow.emit(
+                        CoursesError.UnknownError(
+                            e.message ?: coursesPeriodsUnknownErrorDefaultMessage
+                        )
+                    )
                 }
-                IsLoadingAtomic.compareAndSet(true, false)
+                isLoadingAtomic.compareAndSet(true, false)
             }
             periodsStorage?.let {
                 if (it.isNotEmpty())
@@ -132,9 +152,9 @@ class CoursesViewModel @Inject constructor(
     }
 
     private suspend fun loadCoursesByPeriods(periodsIds: List<Int>) {
-        if (IsLoadingAtomic.get())
+        if (isLoadingAtomic.get())
             return
-        if (!IsLoadingAtomic.compareAndSet(false, true))
+        if (!isLoadingAtomic.compareAndSet(false, true))
             return
         _coursesFlow.emit(State(null, true))
         if (periodsIds.isNotEmpty())
@@ -147,23 +167,37 @@ class CoursesViewModel @Inject constructor(
                     updateCoursesInDb(response.body.coursesByPeriodDto, periodsIds)
                 }
                 is NetworkResponse.ServerError -> {
-
+                    response.body?.invalid_period_id?.let {
+                        _errorsFlow.emit(CoursesError.CoursesListInvalidPeriodId)
+                    }
                 }
-                is NetworkResponse.NetworkError -> {}
-                is NetworkResponse.UnknownError -> {}
+                is NetworkResponse.NetworkError -> {
+                    _errorsFlow.emit(CoursesError.NetworkError)
+                }
+                is NetworkResponse.UnknownError -> {
+                    _errorsFlow.emit(
+                        CoursesError.UnknownError(
+                            response.error.message ?: coursesListUnknownErrorDefaultMessage
+                        )
+                    )
+                }
             }
 
         } catch (e: Throwable) {
-
+            _errorsFlow.emit(
+                CoursesError.UnknownError(
+                    e.message ?: coursesListUnknownErrorDefaultMessage
+                )
+            )
         }
 
         coursesStorage?.let { storage ->
             val notSavedProfileIds =
                 storage.values.flatMap { courses -> courses.flatMap { it.teachersProfiles } }
-                    .toSet() - (profilesStorage?.keys ?: setOf())
+                    .toSet() - (profilesStorage?.keys ?: setOf()).toSet()
             loadProfiles(notSavedProfileIds.toList())
         }
-        IsLoadingAtomic.compareAndSet(true, false)
+        isLoadingAtomic.compareAndSet(true, false)
 
     }
 
@@ -202,12 +236,26 @@ class CoursesViewModel @Inject constructor(
                 is NetworkResponse.Success -> {
                     updateProfilesInDb(response.body.profiles, profilesIds)
                 }
-                is NetworkResponse.ServerError -> TODO()
-                is NetworkResponse.NetworkError -> TODO()
-                is NetworkResponse.UnknownError -> TODO()
+                is NetworkResponse.ServerError -> {
+                    _errorsFlow.emit(CoursesError.UnknownError(getProfilesUnknownErrorDefaultMessage))
+                }
+                is NetworkResponse.NetworkError -> {
+                    _errorsFlow.emit(CoursesError.NetworkError)
+                }
+                is NetworkResponse.UnknownError -> {
+                    _errorsFlow.emit(
+                        CoursesError.UnknownError(
+                            response.error.message ?: getProfilesUnknownErrorDefaultMessage
+                        )
+                    )
+                }
             }
         } catch (e: Throwable) {
-
+            _errorsFlow.emit(
+                CoursesError.UnknownError(
+                    e.message ?: getProfilesUnknownErrorDefaultMessage
+                )
+            )
         }
     }
 
@@ -241,16 +289,16 @@ class CoursesViewModel @Inject constructor(
                 db.coursesDao().deleteCheckBoxState()
                 db.coursesDao().putCheckBoxState(state)
             } catch (e: Throwable) {
-
+                _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
             }
         }
     }
 
     override fun enrollCourse(periodId: Int, courseId: Int) {
-        if (IsLoadingAtomic.get())
+        if (isLoadingAtomic.get())
             return
         viewModelScope.launch(Dispatchers.IO) {
-            if (!IsLoadingAtomic.compareAndSet(false, true))
+            if (!isLoadingAtomic.compareAndSet(false, true))
                 return@launch
             try {
                 when (val response = api.coursesEnroll(
@@ -263,22 +311,41 @@ class CoursesViewModel @Inject constructor(
                             updateCoursesEnrolledStateInDb(courseId, true)
                         }
                     }
-                    is NetworkResponse.ServerError -> TODO()
-                    is NetworkResponse.NetworkError -> TODO()
-                    is NetworkResponse.UnknownError -> TODO()
+                    is NetworkResponse.ServerError -> {
+                        response.body?.invalidCourseId?.let {
+                            _errorsFlow.emit(CoursesError.CoursesEnrollInvalidCourseId)
+                        }
+                        response.body?.alreadyEnrolled?.let {
+                            _errorsFlow.emit(CoursesError.CoursesEnrollAlreadyEnrolled)
+                        }
+                    }
+                    is NetworkResponse.NetworkError -> {
+                        _errorsFlow.emit(CoursesError.NetworkError)
+                    }
+                    is NetworkResponse.UnknownError -> {
+                        _errorsFlow.emit(
+                            CoursesError.UnknownError(
+                                response.error.message ?: coursesEnrollUnknownErrorDefaultMessage
+                            )
+                        )
+                    }
                 }
             } catch (e: Throwable) {
-
+                _errorsFlow.emit(
+                    CoursesError.UnknownError(
+                        e.message ?: coursesEnrollUnknownErrorDefaultMessage
+                    )
+                )
             }
-            IsLoadingAtomic.compareAndSet(true, false)
+            isLoadingAtomic.compareAndSet(true, false)
         }
     }
 
     override fun unenrollCourse(periodId: Int, courseId: Int) {
-        if (IsLoadingAtomic.get())
+        if (isLoadingAtomic.get())
             return
         viewModelScope.launch(Dispatchers.IO) {
-            if (!IsLoadingAtomic.compareAndSet(false, true))
+            if (!isLoadingAtomic.compareAndSet(false, true))
                 return@launch
             try {
                 when (val response = api.coursesUnenroll(
@@ -291,28 +358,48 @@ class CoursesViewModel @Inject constructor(
                             updateCoursesEnrolledStateInDb(courseId, false)
                         }
                     }
-                    is NetworkResponse.ServerError -> TODO()
-                    is NetworkResponse.NetworkError -> TODO()
-                    is NetworkResponse.UnknownError -> TODO()
+                    is NetworkResponse.ServerError -> {
+                        response.body?.invalidCourseId?.let {
+                            _errorsFlow.emit(CoursesError.CoursesUnenrollInvalidCourseId)
+                        }
+                        response.body?.courseIsNotEnrolled?.let {
+                            _errorsFlow.emit(CoursesError.CoursesUnenrollCourseIsNotEnrolled)
+                        }
+                    }
+                    is NetworkResponse.NetworkError -> {
+                        _errorsFlow.emit(CoursesError.NetworkError)
+                    }
+                    is NetworkResponse.UnknownError -> {
+                        _errorsFlow.emit(
+                            CoursesError.UnknownError(
+                                response.error.message ?: coursesUnenrollUnknownErrorDefaultMessage
+                            )
+                        )
+                    }
                 }
             } catch (e: Throwable) {
-
+                _errorsFlow.emit(
+                    CoursesError.UnknownError(
+                        e.message ?: coursesUnenrollUnknownErrorDefaultMessage
+                    )
+                )
             }
-            IsLoadingAtomic.compareAndSet(true, false)
+            isLoadingAtomic.compareAndSet(true, false)
         }
     }
 
-    private fun loadCoursesFromDb(periodsIds: List<Int>) {
+    private suspend fun loadCoursesFromDb(periodsIds: List<Int>) {
         try {
             coursesStorage = coursesStorage ?: mutableMapOf()
             coursesStorage?.plusAssign(
                 db.coursesDao().getCoursesByPeriods(periodsIds).groupBy { it.periodId })
         } catch (e: Throwable) {
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
 
-    private fun updateCoursesInDb(courses: List<PeriodCoursesDto>, periodsIds: List<Int>) {
+    private suspend fun updateCoursesInDb(courses: List<PeriodCoursesDto>, periodsIds: List<Int>) {
         coursesStorage = coursesStorage ?: mutableMapOf()
         courses.forEach { periodCoursesDto ->
             coursesStorage?.put(periodCoursesDto.periodId, periodCoursesDto.courses.map {
@@ -328,25 +415,27 @@ class CoursesViewModel @Inject constructor(
         }
 
         try {
-            coursesStorage?.let {
+            coursesStorage?.let { storage ->
                 db.coursesDao()
-                    .putCourses(it.entries.filter { it.key in periodsIds }.flatMap { it.value })
+                    .putCourses(storage.entries.filter { entry -> entry.key in periodsIds }
+                        .flatMap { entry -> entry.value })
             }
         } catch (e: Throwable) {
-
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
-    private fun loadPeriodsFromDb() {
+    private suspend fun loadPeriodsFromDb() {
         try {
             periodsStorage =
                 db.coursesDao().getPeriods().groupBy { it.id }.mapValues { (_, v) -> v.first() }
                     .toMutableMap()
         } catch (e: Throwable) {
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
-    private fun updatePeriodsInDb(periods: List<PeriodDto>) {
+    private suspend fun updatePeriodsInDb(periods: List<PeriodDto>) {
         val newPeriods = mutableMapOf<Int, PeriodEntity>()
         periods.forEachIndexed { i, periodDto ->
             periodsStorage?.also { storage ->
@@ -370,21 +459,22 @@ class CoursesViewModel @Inject constructor(
                 db.coursesDao().putPeriods(it.values.toList())
             }
         } catch (e: Throwable) {
-
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
-    private fun loadProfilesFromDb(periodsIds: List<Int>) {
+    private suspend fun loadProfilesFromDb(periodsIds: List<Int>) {
         try {
             profilesStorage = profilesStorage ?: mutableMapOf()
             profilesStorage?.plusAssign(
                 db.coursesDao().getProfilesByIds(periodsIds).groupBy { it.id }
                     .mapValues { (_, v) -> v.first() })
         } catch (e: Throwable) {
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
-    private fun updateProfilesInDb(profiles: List<ProfileDto>, profilesIds: List<Int>) {
+    private suspend fun updateProfilesInDb(profiles: List<ProfileDto>, profilesIds: List<Int>) {
         profilesStorage = profilesStorage ?: mutableMapOf()
         profiles.forEach { profileDto ->
             profilesStorage?.put(
@@ -399,12 +489,13 @@ class CoursesViewModel @Inject constructor(
         }
 
         try {
-            coursesStorage?.let {
+            coursesStorage?.let { storage ->
                 db.coursesDao()
-                    .putCourses(it.entries.filter { it.key in profilesIds }.flatMap { it.value })
+                    .putCourses(storage.entries.filter { entry -> entry.key in profilesIds }
+                        .flatMap { entry -> entry.value })
             }
         } catch (e: Throwable) {
-
+            _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
         }
     }
 
@@ -415,7 +506,7 @@ class CoursesViewModel @Inject constructor(
                     db.coursesDao().updatePeriodCheckedState(id, checked)
                 }
             } catch (e: Throwable) {
-
+                _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
             }
         }
     }
@@ -425,8 +516,23 @@ class CoursesViewModel @Inject constructor(
             try {
                 db.coursesDao().updateCourseEnrolledState(id, enrolled)
             } catch (e: Throwable) {
-
+                _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
             }
         }
+    }
+
+    companion object {
+        const val coursesListUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время загрузки списка курсов"
+        const val coursesPeriodsUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время загрузки списка периодов"
+        const val getProfilesUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время загрузки профилей"
+        const val coursesEnrollUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время попытки подписаться на курс"
+        const val coursesUnenrollUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время попытки отписаться от курса"
+        const val dbUnknownErrorDefaultMessage =
+            "Неизвестная ошибка во время чтения/записи из хранилища"
     }
 }

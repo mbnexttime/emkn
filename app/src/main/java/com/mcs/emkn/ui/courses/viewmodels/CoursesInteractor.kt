@@ -10,7 +10,9 @@ interface CoursesInteractor {
 
     val periods: Flow<State<PeriodsData>>
 
-    val navEvents: Flow<CoursesNavEvents>
+    val navEventsFlow: Flow<CoursesNavEvents>
+
+    val errorsFlow: Flow<CoursesError>
 
     fun onPeriodChosen(periodIds: List<Int>)
 

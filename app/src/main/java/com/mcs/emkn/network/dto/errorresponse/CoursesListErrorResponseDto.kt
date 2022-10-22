@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CoursesListErrorResponseDto (
-    @Json(name = "errors") val invalid_period_id: NetError
+    @Json(name = "errors") val invalid_period_id: NetError?
 )
