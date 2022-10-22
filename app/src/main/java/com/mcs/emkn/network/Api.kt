@@ -3,8 +3,7 @@ package com.mcs.emkn.network
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.network.dto.errorresponse.*
 import com.mcs.emkn.network.dto.request.*
-import com.mcs.emkn.network.dto.response.ResponseWithTokenAndTimeDto
-import com.mcs.emkn.network.dto.response.TokenDto
+import com.mcs.emkn.network.dto.response.*
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -48,4 +47,29 @@ interface Api {
     suspend fun accountsRevalidateChangePasswordCredentials(
         @Body request: RevalidateCredentialsDto,
     ): NetworkResponse<Unit, RevalidateRegistrationCredentialsErrorResponseDto>
+
+    @POST("courses/periods")
+    suspend fun coursesPeriods() : NetworkResponse<CoursesPeriodsResponseDto, Unit>
+
+    @POST("courses/list")
+    suspend fun coursesList(
+        @Body request: CoursesListRequestDto
+    ) : NetworkResponse<CoursesListResponseDto, CoursesListErrorResponseDto>
+
+    @POST("courses/enroll")
+    suspend fun coursesEnroll(
+        @Body request: CoursesEnrollUnenrollRequestDto
+    ) : NetworkResponse<Unit, CoursesEnrollErrorResponseDto>
+
+    @POST("courses/unenroll")
+    suspend fun coursesUnenroll(
+        @Body request: CoursesEnrollUnenrollRequestDto
+    ) : NetworkResponse<Unit, CoursesUnenrollErrorResponseDto>
+
+    @POST("profiles/get")
+    suspend fun profilesGet(
+        @Body request: ProfilesGetRequestDto
+    ): NetworkResponse<ProfilesGetResponseDto, Unit>
+
+
 }

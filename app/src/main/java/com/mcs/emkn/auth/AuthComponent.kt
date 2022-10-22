@@ -7,8 +7,6 @@ import com.mcs.emkn.core.Component
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.database.Database
 import com.mcs.emkn.network.Api
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
