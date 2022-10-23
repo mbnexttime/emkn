@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.mcs.emkn.R
 import com.mcs.emkn.core.rv.RecyclerAdapterWithDelegates
 import com.mcs.emkn.core.rv.VerticalSpaceDecorator
 import com.mcs.emkn.databinding.FragmentCoursesBinding
+import com.mcs.emkn.ui.courses.viewmodels.CoursesInteractor
+import com.mcs.emkn.ui.courses.viewmodels.CoursesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -20,6 +23,7 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
     private val adapter = RecyclerAdapterWithDelegates(
         listOf(CoursesAdapter()), listOf()
     )
+    private val coursesInteractor: CoursesInteractor by viewModels<CoursesViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +36,8 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        coursesInteractor.loadPeriods()
+        coursesInteractor.loadCourses()
         adapter.setHasStableIds(true)
         binding.coursesRecycler.adapter = adapter
         binding.coursesRecycler.addItemDecoration(

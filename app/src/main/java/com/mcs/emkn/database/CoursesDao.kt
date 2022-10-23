@@ -46,7 +46,7 @@ interface CoursesDao{
     fun getProfilesByIds(ids: List<Int>): List<ProfileEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun putProfiles(periods: List<ProfileEntity>)
+    fun putProfiles(profiles: List<ProfileEntity>)
 
     @Query("DELETE FROM ${ProfileEntity.PROFILES_TABLE_NAME}")
     fun deleteProfiles()
