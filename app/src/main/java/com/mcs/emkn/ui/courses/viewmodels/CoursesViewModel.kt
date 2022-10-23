@@ -246,11 +246,7 @@ class CoursesViewModel @Inject constructor(
             localStorage.periodsStorage?.let { storage ->
                 emitCourses(storage.filterValues { period -> period.checked }.keys.toList())
             }
-            try {
-                dbInteractor.updateCheckBoxesStateInDb(state)
-            } catch (e: Throwable) {
-                _errorsFlow.emit(CoursesError.DbError(e.message ?: dbUnknownErrorDefaultMessage))
-            }
+            dbInteractor.updateCheckBoxesStateInDb(state)
         }
     }
 

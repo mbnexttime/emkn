@@ -8,5 +8,4 @@ sealed interface CoursesError {
     object CoursesEnrollAlreadyEnrolled : CoursesError
     object CoursesUnenrollInvalidCourseId : CoursesError
     object CoursesUnenrollCourseIsNotEnrolled : CoursesError
-    class DbError(val msg: String) : CoursesError
 }
