@@ -15,9 +15,19 @@ class DbInteractor @Inject constructor(
 ) {
     fun loadCoursesFromDb(periodsIds: List<Int>, localStorage: CoursesViewModel.LocalStorage) {
         try {
+            val requiredPeriodsIds =
+                if (periodsIds.isNotEmpty()) periodsIds else listOf(localStorage.defaultPeriodId)
             localStorage.coursesStorage = localStorage.coursesStorage ?: mutableMapOf()
             localStorage.coursesStorage?.plusAssign(
-                db.coursesDao().getCoursesByPeriods(periodsIds).groupBy { it.periodId })
+                db.coursesDao().getCoursesByPeriods(requiredPeriodsIds).groupBy { it.periodId })
+        } catch (_: Throwable) {
+        }
+    }
+
+    fun loadAllCoursesFromDb(localStorage: CoursesViewModel.LocalStorage) {
+        try {
+            localStorage.coursesStorage =
+                db.coursesDao().getAllCourses().groupBy { it.periodId }.toMutableMap()
         } catch (_: Throwable) {
         }
     }
@@ -27,7 +37,7 @@ class DbInteractor @Inject constructor(
         courses: List<PeriodCoursesDto>,
         periodsIds: List<Int>,
         localStorage: CoursesViewModel.LocalStorage
-    ) {
+    ): Boolean {
         localStorage.coursesStorage = localStorage.coursesStorage ?: mutableMapOf()
         courses.forEach { periodCoursesDto ->
             localStorage.coursesStorage?.put(
@@ -50,8 +60,9 @@ class DbInteractor @Inject constructor(
                     .putCourses(storage.entries.filter { entry -> entry.key in periodsIds }
                         .flatMap { entry -> entry.value })
             }
+            return true
         } catch (_: Throwable) {
-
+            return false
         }
     }
 
@@ -60,6 +71,7 @@ class DbInteractor @Inject constructor(
             localStorage.periodsStorage =
                 db.coursesDao().getPeriods().groupBy { it.id }.mapValues { (_, v) -> v.first() }
                     .toMutableMap()
+            updateDefaultPeriod(localStorage)
         } catch (_: Throwable) {
 
         }
@@ -68,7 +80,7 @@ class DbInteractor @Inject constructor(
     fun updatePeriodsInDb(
         periods: List<PeriodDto>,
         localStorage: CoursesViewModel.LocalStorage
-    ) {
+    ): Boolean {
         val newPeriods = mutableMapOf<Int, PeriodEntity>()
         periods.forEachIndexed { i, periodDto ->
             localStorage.periodsStorage?.also { storage ->
@@ -85,14 +97,16 @@ class DbInteractor @Inject constructor(
             }
         }
         localStorage.periodsStorage = newPeriods
+        updateDefaultPeriod(localStorage)
 
         try {
             localStorage.periodsStorage?.let {
                 db.coursesDao().deletePeriods()
                 db.coursesDao().putPeriods(it.values.toList())
             }
+            return true
         } catch (_: Throwable) {
-
+            return false
         }
     }
 
@@ -140,6 +154,14 @@ class DbInteractor @Inject constructor(
             db.coursesDao().putCheckBoxState(newState)
         } catch (_: Throwable) {
 
+        }
+    }
+
+    private fun updateDefaultPeriod(localStorage: CoursesViewModel.LocalStorage) {
+        localStorage.periodsStorage?.let {
+            if (it.isNotEmpty())
+                localStorage.defaultPeriodId =
+                    it.entries.find { entry -> entry.value.isDefault }?.key ?: it.keys.first()
         }
     }
 }

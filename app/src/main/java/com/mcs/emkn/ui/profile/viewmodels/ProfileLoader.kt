@@ -1,12 +1,12 @@
 package com.mcs.emkn.ui.profile.viewmodels
 
-import android.util.Log
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.mcs.emkn.database.Database
 import com.mcs.emkn.database.entities.ProfileEntity
 import com.mcs.emkn.network.Api
 import com.mcs.emkn.network.dto.request.ProfilesGetRequestDto
 import com.mcs.emkn.network.dto.response.ProfileDto
+import com.mcs.emkn.ui.courses.viewmodels.CoursesViewModel
 import javax.inject.Inject
 
 class ProfileLoader @Inject constructor(
@@ -17,16 +17,15 @@ class ProfileLoader @Inject constructor(
         profilesIds: List<Int>,
         profilesStorage: Map<Int, ProfileEntity>?
     ): LoadProfilesResult {
-        var storage = loadProfilesFromDb(profilesIds, profilesStorage)
         try {
             when (val response = api.profilesGet(ProfilesGetRequestDto(profilesIds))) {
                 is NetworkResponse.Success -> {
-                    storage = updateProfilesInDb(
+                    val storageAndUpdateResult = updateProfilesInDb(
                         response.body.profiles,
                         profilesIds,
-                        storage
+                        profilesStorage
                     )
-                    return LoadProfilesResult.Success(storage)
+                    return LoadProfilesResult.Success(storageAndUpdateResult)
                 }
                 is NetworkResponse.ServerError -> {
                     return LoadProfilesResult.UnknownError(null)
@@ -43,14 +42,21 @@ class ProfileLoader @Inject constructor(
         }
     }
 
-    private fun loadProfilesFromDb(
+    fun loadProfilesFromDb(
         profilesIds: List<Int>,
-        profilesStorage: Map<Int, ProfileEntity>?
     ): Map<Int, ProfileEntity>? {
         return try {
-            profilesStorage?.plus(
                 db.coursesDao().getProfilesByIds(profilesIds).groupBy { it.id }
-                    .mapValues { (_, v) -> v.first() })
+                    .mapValues { (_, v) -> v.first() }
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    fun loadAllProfilesFromDb(): Map<Int, ProfileEntity>? {
+        return try {
+                db.coursesDao().getProfiles().groupBy { it.id }
+                    .mapValues { (_, v) -> v.first() }
         } catch (_: Throwable) {
             null
         }
@@ -60,7 +66,7 @@ class ProfileLoader @Inject constructor(
         profiles: List<ProfileDto>,
         profilesIds: List<Int>,
         profilesStorage: Map<Int, ProfileEntity>?
-    ): Map<Int, ProfileEntity>? {
+    ): Pair<Map<Int, ProfileEntity>?, Boolean> {
         val newStorage = profilesStorage?.toMutableMap() ?: mutableMapOf()
         profiles.forEach { profileDto ->
             newStorage.put(
@@ -74,19 +80,18 @@ class ProfileLoader @Inject constructor(
             )
         }
 
-
         return try {
             db.coursesDao()
                 .putProfiles(newStorage.entries.filter { entry -> entry.key in profilesIds }
                     .map { entry -> entry.value })
-            newStorage
+            newStorage to true
         } catch (e: Throwable) {
-            null
+            newStorage to false
         }
     }
 
     sealed interface LoadProfilesResult {
-        class Success(val storage: Map<Int, ProfileEntity>?) : LoadProfilesResult
+        class Success(val storageAndUpdateResult: Pair<Map<Int, ProfileEntity>?, Boolean>) : LoadProfilesResult
         object NetworkError : LoadProfilesResult
         class UnknownError(val msg: String?) : LoadProfilesResult
     }

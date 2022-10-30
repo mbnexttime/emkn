@@ -6,7 +6,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 
 interface CoursesInteractor {
-    val courses: Flow<State<Map<Int, List<Course>>>>
+    val courses: Flow<State<Map<Int, PeriodCourses>>>
 
     val periods: Flow<State<PeriodsData>>
 
@@ -16,9 +16,8 @@ interface CoursesInteractor {
 
     fun onPeriodChosen(periodIds: List<Int>)
 
-    fun loadCourses()
 
-    fun loadPeriods()
+    fun loadPeriodsAndCourses()
 
     fun loadCheckBoxesState(): Deferred<CheckBoxesStateEntity>
 

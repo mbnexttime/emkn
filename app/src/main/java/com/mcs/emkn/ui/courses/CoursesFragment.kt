@@ -36,8 +36,7 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        coursesInteractor.loadPeriods()
-        coursesInteractor.loadCourses()
+        coursesInteractor.loadPeriodsAndCourses()
         adapter.setHasStableIds(true)
         binding.coursesRecycler.adapter = adapter
         binding.coursesRecycler.addItemDecoration(

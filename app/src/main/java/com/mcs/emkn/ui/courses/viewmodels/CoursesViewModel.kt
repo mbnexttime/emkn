@@ -1,5 +1,6 @@
 package com.mcs.emkn.ui.courses.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haroldadmin.cnradapter.NetworkResponse
@@ -28,7 +29,7 @@ class CoursesViewModel @Inject constructor(
     private val dbInteractor: DbInteractor,
     private val profileLoader: ProfileLoader
 ) : CoursesInteractor, ViewModel() {
-    override val courses: Flow<State<Map<Int, List<Course>>>>
+    override val courses: Flow<State<Map<Int, PeriodCourses>>>
         get() = _coursesFlow
     override val periods: Flow<State<PeriodsData>>
         get() = _periodsFlow
@@ -37,19 +38,23 @@ class CoursesViewModel @Inject constructor(
     override val errorsFlow: Flow<CoursesError>
         get() = _errorsFlow
 
-    private val _coursesFlow = MutableSharedFlow<State<Map<Int, List<Course>>>>()
+    private val _coursesFlow = MutableSharedFlow<State<Map<Int, PeriodCourses>>>()
     private val _periodsFlow = MutableSharedFlow<State<PeriodsData>>()
     private val _navEvents = MutableSharedFlow<CoursesNavEvents>()
     private val _errorsFlow = MutableSharedFlow<CoursesError>()
 
 
-    private val localStorage = LocalStorage()
+    private var isPeriodsUpdated = false
+    private var isCoursesUpdated = false
+    private var isProfilesUpdated = false
 
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     override fun onPeriodChosen(periodIds: List<Int>) {
         viewModelScope.launch(dispatcher) {
             _coursesFlow.emit(State(null, true))
+            val localStorage = LocalStorage()
+            dbInteractor.loadPeriodsFromDb(localStorage)
             val idsNeededForUpdate: MutableList<Pair<Int, Boolean>> = mutableListOf()
             localStorage.periodsStorage?.forEach { (id, period) ->
                 if (id in periodIds && !period.checked) {
@@ -61,99 +66,105 @@ class CoursesViewModel @Inject constructor(
                 }
             }
             dbInteractor.updatePeriodsCheckedStateInDb(idsNeededForUpdate)
+            dbInteractor.loadCoursesFromDb(periodIds, localStorage)
             val chosenIdsSet =
                 if (periodIds.isNotEmpty()) periodIds.toSet() else setOf(localStorage.defaultPeriodId)
             val idsNeededForLoading =
                 (chosenIdsSet - (localStorage.coursesStorage?.keys ?: setOf()).toSet()).toList()
 
             if (idsNeededForLoading.isNotEmpty())
-                loadCoursesByPeriods(idsNeededForLoading)
-            emitCourses(periodIds)
+                loadCoursesByPeriods(idsNeededForLoading, localStorage)
+            emitCourses(periodIds, localStorage)
         }
     }
 
-    override fun loadCourses() {
+    override fun loadPeriodsAndCourses() {
         viewModelScope.launch(dispatcher) {
-            if (localStorage.periodsStorage == null)
-                return@launch
-            if (localStorage.coursesStorage == null) {
-                localStorage.periodsStorage?.let { storage ->
-                    _coursesFlow.emit(State(null, true))
-                    val requiredPeriods =
-                        storage.entries.filter { entry -> entry.value.checked }
-                            .map { entry -> entry.key }
+            val localStorage = LocalStorage()
+            loadPeriods(localStorage)
+            loadCourses(localStorage)
+        }
+    }
 
-                    loadCoursesByPeriods(requiredPeriods)
-                    emitCourses(requiredPeriods)
-                }
+    private suspend fun loadCourses(localStorage: LocalStorage) {
+        localStorage.periodsStorage?.let { storage ->
+            val requiredPeriods =
+                storage.entries.filter { entry -> entry.value.checked }
+                    .map { entry -> entry.key }
+
+            _coursesFlow.emit(State(null, true))
+            if (!isCoursesUpdated) {
+                dbInteractor.loadCoursesFromDb(requiredPeriods, localStorage)
+                loadCoursesByPeriods(requiredPeriods, localStorage)
+            } else {
+                dbInteractor.loadCoursesFromDb(requiredPeriods, localStorage)
             }
+            emitCourses(requiredPeriods, localStorage)
         }
     }
 
-    override fun loadPeriods() {
-        viewModelScope.launch(dispatcher) {
-            _periodsFlow.emit(State(null, true))
+    private suspend fun loadPeriods(localStorage: LocalStorage) {
+        _periodsFlow.emit(State(null, true))
 
-            if (localStorage.periodsStorage == null) {
-                dbInteractor.loadPeriodsFromDb(localStorage)
-                try {
-                    when (val response = api.coursesPeriods()) {
-                        is NetworkResponse.Success -> {
+        if (!isPeriodsUpdated) {
+            dbInteractor.loadPeriodsFromDb(localStorage)
+            try {
+                when (val response = api.coursesPeriods()) {
+                    is NetworkResponse.Success -> {
+                        isPeriodsUpdated =
                             dbInteractor.updatePeriodsInDb(response.body.periods, localStorage)
-                        }
-                        is NetworkResponse.ServerError -> {
-                            _errorsFlow.emit(
-                                CoursesError.UnknownError(
-                                    coursesPeriodsUnknownErrorDefaultMessage
-                                )
-                            )
-                        }
-                        is NetworkResponse.NetworkError -> {
-                            _errorsFlow.emit(CoursesError.NetworkError)
-                        }
-                        is NetworkResponse.UnknownError -> {
-                            _errorsFlow.emit(
-                                CoursesError.UnknownError(
-                                    response.error.message
-                                        ?: coursesPeriodsUnknownErrorDefaultMessage
-                                )
-                            )
-                        }
+                        isCoursesUpdated = false
                     }
-                } catch (e: Throwable) {
-                    _errorsFlow.emit(
-                        CoursesError.UnknownError(
-                            e.message ?: coursesPeriodsUnknownErrorDefaultMessage
+                    is NetworkResponse.ServerError -> {
+                        _errorsFlow.emit(
+                            CoursesError.UnknownError(
+                                coursesPeriodsUnknownErrorDefaultMessage
+                            )
                         )
-                    )
+                    }
+                    is NetworkResponse.NetworkError -> {
+                        _errorsFlow.emit(CoursesError.NetworkError)
+                    }
+                    is NetworkResponse.UnknownError -> {
+                        _errorsFlow.emit(
+                            CoursesError.UnknownError(
+                                response.error.message
+                                    ?: coursesPeriodsUnknownErrorDefaultMessage
+                            )
+                        )
+                    }
                 }
-            }
-            localStorage.periodsStorage?.let {
-                if (it.isNotEmpty())
-                    localStorage.defaultPeriodId =
-                        it.entries.find { entry -> entry.value.isDefault }?.key ?: it.keys.first()
-            }
-
-            _periodsFlow.emit(
-                State(
-                    data = PeriodsData(
-                        localStorage.periodsStorage?.values?.toList() ?: listOf()
-                    ),
-                    hasMore = false
+            } catch (e: Throwable) {
+                _errorsFlow.emit(
+                    CoursesError.UnknownError(
+                        e.message ?: coursesPeriodsUnknownErrorDefaultMessage
+                    )
                 )
-            )
+            }
+        } else {
+            dbInteractor.loadPeriodsFromDb(localStorage)
         }
+
+        _periodsFlow.emit(
+            State(
+                data = PeriodsData(
+                    localStorage.periodsStorage?.values?.toList() ?: listOf()
+                ),
+                hasMore = false
+            )
+        )
+
     }
 
-    private suspend fun loadCoursesByPeriods(periodsIds: List<Int>) {
-        if (periodsIds.isNotEmpty())
-            dbInteractor.loadCoursesFromDb(periodsIds, localStorage)
-        else
-            dbInteractor.loadCoursesFromDb(listOf(localStorage.defaultPeriodId), localStorage)
+    private suspend fun loadCoursesByPeriods(periodsIds: List<Int>, localStorage: LocalStorage) {
         try {
             when (val response = api.coursesList(CoursesListRequestDto(periodsIds))) {
                 is NetworkResponse.Success -> {
-                    dbInteractor.updateCoursesInDb(response.body.coursesByPeriodDto, periodsIds, localStorage)
+                    isCoursesUpdated = dbInteractor.updateCoursesInDb(
+                        response.body.coursesByPeriodDto,
+                        periodsIds,
+                        localStorage
+                    )
                 }
                 is NetworkResponse.ServerError -> {
                     response.body?.invalid_period_id?.let {
@@ -180,47 +191,78 @@ class CoursesViewModel @Inject constructor(
         }
 
         localStorage.coursesStorage?.let { storage ->
-            val notSavedProfileIds =
+            val profilesIds =
                 storage.values.flatMap { courses -> courses.flatMap { it.teachersProfiles } }
-                    .toSet() - (localStorage.profilesStorage?.keys ?: setOf()).toSet()
-            when(val result = profileLoader.loadProfiles(notSavedProfileIds.toList(), localStorage.profilesStorage)) {
-                is ProfileLoader.LoadProfilesResult.Success -> {
-                   localStorage.profilesStorage = result.storage?.toMutableMap()
-                }
-                ProfileLoader.LoadProfilesResult.NetworkError -> {
-                    _errorsFlow.emit(CoursesError.NetworkError)
-                }
-                is ProfileLoader.LoadProfilesResult.UnknownError -> {
-                    _errorsFlow.emit(CoursesError.UnknownError(result.msg ?: getProfilesUnknownErrorDefaultMessage))
+                    .toSet()
+
+            localStorage.profilesStorage =
+                profileLoader.loadProfilesFromDb(profilesIds.toList())?.toMutableMap()
+
+            val requiredProfileIds = if (isProfilesUpdated)
+                profilesIds - (localStorage.profilesStorage?.keys
+                    ?: setOf()).toSet() else profilesIds
+
+            if (requiredProfileIds.isNotEmpty()) {
+                when (val result = profileLoader.loadProfiles(
+                    requiredProfileIds.toList(),
+                    localStorage.profilesStorage
+                )) {
+                    is ProfileLoader.LoadProfilesResult.Success -> {
+                        val (newProfileStorage, updateResult) = result.storageAndUpdateResult
+                        localStorage.profilesStorage = newProfileStorage?.toMutableMap()
+                        isProfilesUpdated = updateResult
+                    }
+                    ProfileLoader.LoadProfilesResult.NetworkError -> {
+                        _errorsFlow.emit(CoursesError.NetworkError)
+                    }
+                    is ProfileLoader.LoadProfilesResult.UnknownError -> {
+                        _errorsFlow.emit(
+                            CoursesError.UnknownError(
+                                result.msg ?: getProfilesUnknownErrorDefaultMessage
+                            )
+                        )
+                    }
                 }
             }
         }
     }
 
-    private suspend fun emitCourses(periodsIds: List<Int>) {
-        val periodsIdsSet = if(periodsIds.isNotEmpty()) periodsIds.toSet() else setOf(localStorage.defaultPeriodId)
-       _coursesFlow.emit(
+    private suspend fun emitCourses(periodsIds: List<Int>, localStorage: LocalStorage) {
+        val periodsIdsSet =
+            if (periodsIds.isNotEmpty()) periodsIds.toSet() else setOf(localStorage.defaultPeriodId)
+        dbInteractor.loadCheckBoxesStateFromDb(localStorage)
+        _coursesFlow.emit(
             State(
                 data =
-                localStorage.coursesStorage?.filterKeys { it in periodsIdsSet }?.mapValues { entry ->
-                    entry.value.filter {
-                        it.enrolled && (localStorage.checkBoxesState?.isExcludingEnroll?.not() ?: true)
-                                || !it.enrolled && (localStorage.checkBoxesState?.isExcludingUnenroll?.not()
-                            ?: true)
-                    }.map {
-                        Course(
-                            entry.key,
-                            it.id,
-                            it.title,
-                            it.enrolled,
-                            it.shortDescription,
-                            it.teachersProfiles.map { id ->
-                                localStorage.profilesStorage?.get(id)
-                                    ?: ProfileEntity(id, "", "", "")
+                localStorage.coursesStorage?.filterKeys { it in periodsIdsSet }
+                    ?.mapValues { entry ->
+                        PeriodCourses(
+                            period = localStorage.periodsStorage?.get(entry.key) ?: PeriodEntity(
+                                entry.key,
+                                "",
+                                false,
+                                false
+                            ),
+                            courses = entry.value.filter {
+                                it.enrolled && (localStorage.checkBoxesState?.isExcludingEnroll?.not()
+                                    ?: true)
+                                        || !it.enrolled && (localStorage.checkBoxesState?.isExcludingUnenroll?.not()
+                                    ?: true)
+                            }.map {
+                                Course(
+                                    entry.key,
+                                    it.id,
+                                    it.title,
+                                    it.enrolled,
+                                    it.shortDescription,
+                                    it.teachersProfiles.map { id ->
+                                        localStorage.profilesStorage?.get(id)
+                                            ?: ProfileEntity(id, "", "", "")
+                                    }
+                                )
                             }
                         )
-                    }
-                },
+                    },
                 hasMore = false
             )
         )
@@ -228,10 +270,7 @@ class CoursesViewModel @Inject constructor(
 
     override fun loadCheckBoxesState(): Deferred<CheckBoxesStateEntity> {
         return viewModelScope.async(dispatcher) {
-            localStorage.checkBoxesState?.let {
-                return@async it
-            }
-
+            val localStorage = LocalStorage()
             dbInteractor.loadCheckBoxesStateFromDb(localStorage)
             localStorage.checkBoxesState?.let {
                 return@async it
@@ -242,9 +281,13 @@ class CoursesViewModel @Inject constructor(
 
     override fun putCheckBoxesState(state: CheckBoxesStateEntity) {
         viewModelScope.launch(dispatcher) {
+            val localStorage = LocalStorage()
             localStorage.checkBoxesState = state
+            dbInteractor.loadPeriodsFromDb(localStorage)
             localStorage.periodsStorage?.let { storage ->
-                emitCourses(storage.filterValues { period -> period.checked }.keys.toList())
+                val periodIds = storage.filterValues { period -> period.checked }.keys.toList()
+                dbInteractor.loadCoursesFromDb(periodIds, localStorage)
+                emitCourses(periodIds, localStorage)
             }
             dbInteractor.updateCheckBoxesStateInDb(state)
         }
@@ -257,11 +300,7 @@ class CoursesViewModel @Inject constructor(
                     CoursesEnrollUnenrollRequestDto(courseId)
                 )) {
                     is NetworkResponse.Success -> {
-                        val course = localStorage.coursesStorage?.get(periodId)?.find { it.id == courseId }
-                        course?.let {
-                            it.enrolled = true
-                            dbInteractor.updateCoursesEnrolledStateInDb(courseId, true)
-                        }
+                        dbInteractor.updateCoursesEnrolledStateInDb(courseId, true)
                     }
                     is NetworkResponse.ServerError -> {
                         response.body?.invalidCourseId?.let {
@@ -299,11 +338,7 @@ class CoursesViewModel @Inject constructor(
                     CoursesEnrollUnenrollRequestDto(courseId)
                 )) {
                     is NetworkResponse.Success -> {
-                        val course = localStorage.coursesStorage?.get(periodId)?.find { it.id == courseId }
-                        course?.let {
-                            it.enrolled = false
-                            dbInteractor.updateCoursesEnrolledStateInDb(courseId, false)
-                        }
+                        dbInteractor.updateCoursesEnrolledStateInDb(courseId, false)
                     }
                     is NetworkResponse.ServerError -> {
                         response.body?.invalidCourseId?.let {
@@ -333,7 +368,6 @@ class CoursesViewModel @Inject constructor(
             }
         }
     }
-
 
 
     companion object {
