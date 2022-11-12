@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.database.Database
 import com.mcs.emkn.databinding.FragmentTasksBinding

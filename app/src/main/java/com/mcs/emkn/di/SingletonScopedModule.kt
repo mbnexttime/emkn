@@ -24,7 +24,7 @@ class SingletonScopedModule {
 
     @Provides
     @Singleton
-    fun provideDb(
+    fun provideAuthDb(
         application: Application,
     ): Database {
         return Room.databaseBuilder(
