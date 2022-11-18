@@ -10,8 +10,6 @@ data class PeriodEntity(
     @PrimaryKey
     val id: Int,
     val text: String,
-    var checked: Boolean,
-    val isDefault: Boolean
 ) {
     companion object {
         const val PERIODS_TABLE_NAME = "periods"

@@ -4,10 +4,9 @@ import com.mcs.emkn.database.entities.ProfileEntity
 import com.squareup.moshi.Json
 
 data class Course(
-    val periodId: Int,
     val id: Int,
     val title: String,
     val enrolled: Boolean,
     val shortDescription: String,
-    val teachersProfiles: List<ProfileEntity>
+    val teachersProfiles: List<Int>
 )

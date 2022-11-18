@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/courses_settings_background"
     android:paddingHorizontal="21dp"
-    android:paddingBottom="4dp">
+    android:paddingBottom="4dp"
+    android:visibility="gone">
 
     <CheckBox
         android:id="@+id/excludeEnrolled"
@@ -45,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:indeterminate="true"
+        android:visibility="gone"
         app:indicatorColor="@color/text_reversed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/excludeUnenrolled" />

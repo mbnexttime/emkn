@@ -8,7 +8,10 @@ import com.mcs.emkn.R
 import com.mcs.emkn.core.rv.ViewHolder
 import com.mcs.emkn.databinding.CourseViewHolderBinding
 
-class CourseViewHolder(parent: ViewGroup) :
+class CourseViewHolder(
+        parent: ViewGroup,
+        private val listener: CoursesAdapter.CoursesListener,
+) :
     ViewHolder<CourseItem>(R.layout.course_view_holder, parent) {
 
     private val binding = CourseViewHolderBinding.bind(itemView)
@@ -37,6 +40,9 @@ class CourseViewHolder(parent: ViewGroup) :
                 binding.enrollButton.background =
                     AppCompatResources.getDrawable(context, R.drawable.unenroll_background)
             }
+        }
+        binding.enrollButton.setOnClickListener {
+            listener.onCourseEnrollButtonClick(item.id)
         }
     }
 }

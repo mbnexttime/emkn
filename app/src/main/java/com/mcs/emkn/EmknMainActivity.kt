@@ -30,6 +30,6 @@ class EmknMainActivity : AppCompatActivity() {
     }
 
     private fun chooseNavGraph() {
-        routerImpl.goToUserNavGraph()
+        routerImpl.goToRegistrationNavGraph()
     }
 }

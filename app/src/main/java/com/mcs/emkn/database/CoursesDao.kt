@@ -33,9 +33,6 @@ interface CoursesDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun putPeriods(periods: List<PeriodEntity>)
 
-    @Query("UPDATE ${PeriodEntity.PERIODS_TABLE_NAME} SET checked=:checked WHERE id = :id")
-    fun updatePeriodCheckedState(id: Int, checked: Boolean)
-
     @Query("DELETE FROM ${PeriodEntity.PERIODS_TABLE_NAME}")
     fun deletePeriods()
 

@@ -5,6 +5,8 @@ import com.mcs.emkn.network.dto.errorresponse.*
 import com.mcs.emkn.network.dto.request.*
 import com.mcs.emkn.network.dto.response.*
 import retrofit2.http.Body
+import retrofit2.http.Header
+import retrofit2.http.HeaderMap
 import retrofit2.http.POST
 
 interface Api {
@@ -49,26 +51,30 @@ interface Api {
     ): NetworkResponse<Unit, RevalidateRegistrationCredentialsErrorResponseDto>
 
     @POST("courses/periods")
-    suspend fun coursesPeriods() : NetworkResponse<CoursesPeriodsResponseDto, Unit>
+    suspend fun coursesPeriods(@Body empty: EmptyRequest, @Header("Authorization") auth: String) : NetworkResponse<CoursesPeriodsResponseDto, Unit>
 
     @POST("courses/list")
     suspend fun coursesList(
-        @Body request: CoursesListRequestDto
+        @Body request: CoursesListRequestDto,
+        @Header("Authorization") auth: String,
     ) : NetworkResponse<CoursesListResponseDto, CoursesListErrorResponseDto>
 
     @POST("courses/enroll")
     suspend fun coursesEnroll(
-        @Body request: CoursesEnrollUnenrollRequestDto
+        @Body request: CoursesEnrollUnenrollRequestDto,
+        @Header("Authorization") auth: String,
     ) : NetworkResponse<Unit, CoursesEnrollErrorResponseDto>
 
     @POST("courses/unenroll")
     suspend fun coursesUnenroll(
-        @Body request: CoursesEnrollUnenrollRequestDto
+        @Body request: CoursesEnrollUnenrollRequestDto,
+        @Header("Authorization") auth: String,
     ) : NetworkResponse<Unit, CoursesUnenrollErrorResponseDto>
 
     @POST("profiles/get")
-    suspend fun profilesGet(
-        @Body request: ProfilesGetRequestDto
+    suspend fun     profilesGet(
+        @Body request: ProfilesGetRequestDto,
+        @Header("Authorization") auth: String,
     ): NetworkResponse<ProfilesGetResponseDto, Unit>
 
 
