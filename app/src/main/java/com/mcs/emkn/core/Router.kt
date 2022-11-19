@@ -14,4 +14,6 @@ interface Router {
     fun goToRegistrationNavGraph()
 
     fun goToUserNavGraph()
+
+    fun goToProfile()
 }

@@ -50,7 +50,7 @@ class SignInViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         db.runInTransaction {
                             db.clearAllTables()
-                            db.accountsDao().putCredentials(Credentials(login, password, true))
+                            db.accountsDao().putCredentials(Credentials(login, password, true, response.body.id))
                         }
                         _navEvents.emit(SignInNavEvent.ContinueSignIn)
                     }

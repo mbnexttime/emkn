@@ -23,7 +23,7 @@ interface Api {
     @POST("accounts/login")
     suspend fun accountsLogin(
         @Body request: LoginRequestDto
-    ): NetworkResponse<Unit, LoginErrorResponseDto>
+    ): NetworkResponse<LoginResponse, LoginErrorResponseDto>
 
     @POST("accounts/begin_change_password")
     suspend fun accountsBeginChangePassword(
@@ -72,10 +72,14 @@ interface Api {
     ) : NetworkResponse<Unit, CoursesUnenrollErrorResponseDto>
 
     @POST("profiles/get")
-    suspend fun     profilesGet(
+    suspend fun profilesGet(
         @Body request: ProfilesGetRequestDto,
         @Header("Authorization") auth: String,
     ): NetworkResponse<ProfilesGetResponseDto, Unit>
 
-
+    @POST("profiles/load_image")
+    suspend fun uploadImage(
+        @Body request: UploadImageRequestDto,
+        @Header("Authorization") auth: String,
+    ): NetworkResponse<Unit, Unit>
 }

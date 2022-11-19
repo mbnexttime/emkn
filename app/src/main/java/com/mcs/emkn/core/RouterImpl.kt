@@ -57,4 +57,8 @@ class RouterImpl @Inject constructor() : Router {
             navController?.navigate(R.id.action_userNavGraph)
         } catch(_: Throwable) { }
     }
+
+    override fun goToProfile() {
+        navController?.navigate(R.id.action_CoursesFragment_to_ProfileFragment)
+    }
 }

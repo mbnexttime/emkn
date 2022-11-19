@@ -32,14 +32,10 @@ class ProfilesLoader @Inject constructor(
         scope.launch {
             val profiles = db.coursesDao().getProfilesByIds(ids).toMutableList()
             _profiles.emit(profiles.associate { it.id to Profile(it.id, Uri.parse(it.avatarUrl), it.firstName, it.secondName) })
-            val filtered = ids.minus(profiles.map { it.id })
-            if (filtered.isEmpty()) {
-                return@launch
-            }
-            when (val response = api.profilesGet(ProfilesGetRequestDto(filtered), db.accountsDao().getCredentials().first().toAuthHeader())) {
+            when (val response = api.profilesGet(ProfilesGetRequestDto(ids), db.accountsDao().getCredentials().first().toAuthHeader())) {
                 is NetworkResponse.Success -> {
                     db.coursesDao().putProfiles(response.body.response.profiles.map { ProfileEntity(it.id, it.avatarUrl, it.firstName, it.secondName) })
-                    val profiles = db.coursesDao().getProfilesByIds(filtered).toMutableList()
+                    val profiles = db.coursesDao().getProfilesByIds(ids).toMutableList()
                     _profiles.emit(profiles.associate { it.id to Profile(it.id, Uri.parse(it.avatarUrl), it.firstName, it.secondName) })
                 }
                 else -> {}

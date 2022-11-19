@@ -42,4 +42,7 @@
     <string name="courses_title">курсы</string>
     <string name="exclude_enroll_courses">исключить пройденные курсы</string>
     <string name="exclude_unenrolled_courses">исключить непройденные курсы</string>
+    <string name="profile_title">профиль</string>
+    <string name="settings_title">настройки</string>
+    <string name="upload_photo_title">Загрузить новую фотографию</string>
 </resources>

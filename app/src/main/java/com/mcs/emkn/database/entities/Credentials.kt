@@ -10,7 +10,8 @@ data class Credentials(
         @PrimaryKey
         val login: String,
         val password: String,
-        val isAuthorized: Boolean
+        val isAuthorized: Boolean,
+        val id: Int?,
 ) {
     fun toAuthHeader(): String {
         val encodedCredentials = getEncoder().encodeToString("$login:$password".toByteArray())

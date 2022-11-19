@@ -53,7 +53,7 @@ class EmailConfirmationViewModel @Inject constructor(
                     is NetworkResponse.Success -> {
                         db.accountsDao().deleteCredentials()
                         db.accountsDao()
-                            .putCredentials(Credentials(attempt.login, attempt.password, false))
+                            .putCredentials(Credentials(attempt.login, attempt.password, false, null))
                         db.accountsDao().deleteSignUpAttempts()
                         _navEvents.emit(EmailConfirmationNavEvent.ContinueConfirmation)
                     }

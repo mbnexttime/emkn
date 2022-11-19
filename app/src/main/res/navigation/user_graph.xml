@@ -12,5 +12,16 @@
     <fragment
         android:id="@+id/coursesFragment"
         android:name="com.mcs.emkn.ui.courses.CoursesFragment"
-        android:label="CoursesFragment" />
+        android:label="CoursesFragment">
+
+        <action
+            android:id="@+id/action_CoursesFragment_to_ProfileFragment"
+            app:destination="@id/profileFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.mcs.emkn.ui.profile.viewmodels.ProfileFragment"
+        android:label="ProfileFragment" />
 </navigation>

@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.mcs.emkn.R
+import com.mcs.emkn.core.Router
 import com.mcs.emkn.core.rv.RecyclerAdapterWithDelegates
 import com.mcs.emkn.core.rv.VerticalSpaceDecorator
 import com.mcs.emkn.databinding.FragmentCoursesBinding
@@ -48,6 +49,8 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     @Inject
     lateinit var profilesLoader: ProfilesLoader
+    @Inject
+    lateinit var router: Router
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -130,6 +133,9 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
         binding.coursesSettings.excludeUnenrolled.setOnCheckedChangeListener { buttonView, isChecked ->
             checkBoxesState = checkBoxesState.copy(isExcludingUnenroll = isChecked)
             updateList()
+        }
+        binding.profileIcon.setOnClickListener {
+            router.goToProfile()
         }
     }
 
