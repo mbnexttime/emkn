@@ -45,4 +45,5 @@
     <string name="profile_title">профиль</string>
     <string name="settings_title">настройки</string>
     <string name="upload_photo_title">Загрузить новую фотографию</string>
+    <string name="course_homeworks_title">домашние задания</string>
 </resources>

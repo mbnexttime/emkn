@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_graph"
-    app:startDestination="@+id/startPageFragment">
+    app:startDestination="@id/coursePageFragment">
 
     <action
         android:id="@+id/action_registrationNavGraph"
@@ -24,5 +24,9 @@
         android:id="@+id/startPageFragment"
         android:name="com.mcs.emkn.ui.startpage.StartPageFragment"
         android:label="StartPageFragment" />
+    <fragment
+        android:id="@+id/coursePageFragment"
+        android:name="com.mcs.emkn.ui.coursepage.CoursePageFragment"
+        android:label="CoursePageFragment" />
 
 </navigation>
