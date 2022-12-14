@@ -1,6 +1,5 @@
 package com.mcs.emkn.ui.courses
 
-import android.database.DataSetObserver
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +24,6 @@ import com.mcs.emkn.ui.courses.viewmodels.CoursesViewModel
 import com.mcs.emkn.ui.profile.viewmodels.Profile
 import com.mcs.emkn.ui.profile.viewmodels.ProfilesLoader
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,13 +33,30 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
     private var _binding: FragmentCoursesBinding? = null
     private val binding get() = _binding!!
     private val adapter = RecyclerAdapterWithDelegates(
-            listOf(CoursesAdapter(
-                    object : CoursesAdapter.CoursesListener {
-                        override fun onCourseEnrollButtonClick(courseId: Int) {
-                            coursesInteractor.changeEnrollState(courseId)
-                        }
+        listOf(CoursesAdapter(
+            object : CoursesAdapter.CoursesListener {
+                override fun onCourseEnrollButtonClick(courseId: Int) {
+                    coursesInteractor.changeEnrollState(courseId)
+                }
+
+                override fun onCourseTitleClick(courseId: Int) {
+                    val course = courses.find { it.id == courseId }
+                    course?.let {
+                        val title = course.title
+                        val courseProfiles =
+                            course.teachersProfiles.map { profile_id -> profiles[profile_id] }
+                                .filterNotNull().toTypedArray()
+                        val description = course.shortDescription
+                        val bundle = bundleOf(
+                            "title" to title,
+                            "profiles" to courseProfiles,
+                            "description" to description
+                        )
+                        router.goToCoursePage(bundle)
                     }
-            )), listOf()
+                }
+            }
+        )), listOf()
     )
     private val coursesInteractor: CoursesInteractor by viewModels<CoursesViewModel>()
     private var courses: List<Course> = listOf()
@@ -49,13 +65,14 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     @Inject
     lateinit var profilesLoader: ProfilesLoader
+
     @Inject
     lateinit var router: Router
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCoursesBinding.inflate(inflater, container, false)
         return binding.root
@@ -63,14 +80,13 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter.setHasStableIds(true)
         binding.coursesRecycler.adapter = adapter
         binding.coursesRecycler.addItemDecoration(
-                VerticalSpaceDecorator(
-                        view.context.resources.getDimensionPixelSize(
-                                R.dimen.courses_items_offset
-                        )
+            VerticalSpaceDecorator(
+                view.context.resources.getDimensionPixelSize(
+                    R.dimen.courses_items_offset
                 )
+            )
         )
 
         lifecycleScope.launch {
@@ -81,18 +97,24 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
                 val periods = it.periods.reversed()
                 val periodsNames = periods.map { it.text }
                 val spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(
-                        this@CoursesFragment.requireContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
-                        periodsNames
+                    this@CoursesFragment.requireContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    periodsNames
                 )
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.coursesSettings.periodChooser.onItemSelectedListener = object : OnItemSelectedListener {
-                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        coursesInteractor.onPeriodChosen(periods[position].id)
-                    }
+                binding.coursesSettings.periodChooser.onItemSelectedListener =
+                    object : OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            coursesInteractor.onPeriodChosen(periods[position].id)
+                        }
 
-                    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-                }
+                        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+                    }
                 binding.coursesSettings.periodChooser.adapter = spinnerAdapter
             }
         }
@@ -151,11 +173,11 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
             val teacher = it.teachersProfiles.firstOrNull().let { profiles[it] }
             val name = if (teacher == null) "..." else "${teacher.firstName} ${teacher.secondName}"
             CourseItem(
-                    it.id,
-                    it.title,
-                    name,
-                    it.shortDescription,
-                    if (it.enrolled) CourseItem.ButtonState.Unenroll else CourseItem.ButtonState.Enroll
+                it.id,
+                it.title,
+                name,
+                it.shortDescription,
+                if (it.enrolled) CourseItem.ButtonState.Unenroll else CourseItem.ButtonState.Enroll
             )
         }
         adapter.items = items

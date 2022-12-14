@@ -22,4 +22,5 @@
     <color name="text_50">#7F000000</color>
     <color name="text_reversed">#FFFFFF</color>
     <color name="error">#FF5353</color>
+    <color name="status">#1A000000</color>
 </resources>

@@ -10,6 +10,8 @@ class CoursesAdapter(
 
     interface CoursesListener {
         fun onCourseEnrollButtonClick(courseId: Int)
+
+        fun onCourseTitleClick(courseId: Int)
     }
 
     override fun onBindViewHolder(viewHolder: CourseViewHolder, item: CourseItem) {

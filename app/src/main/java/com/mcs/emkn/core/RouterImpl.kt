@@ -1,5 +1,6 @@
 package com.mcs.emkn.core
 
+import android.os.Bundle
 import androidx.navigation.NavController
 import com.mcs.emkn.R
 import javax.inject.Inject
@@ -60,5 +61,13 @@ class RouterImpl @Inject constructor() : Router {
 
     override fun goToProfile() {
         navController?.navigate(R.id.action_CoursesFragment_to_ProfileFragment)
+    }
+
+    override fun goToCoursePage(bundle: Bundle) {
+        navController?.navigate(R.id.action_coursesFragment_to_coursePageFragment, bundle)
+    }
+
+    override fun goToCourseHomeworks() {
+        navController?.navigate(R.id.action_coursePageFragment_to_courseHomeworksFragment)
     }
 }
