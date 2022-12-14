@@ -44,5 +44,8 @@ class CourseViewHolder(
         binding.enrollButton.setOnClickListener {
             listener.onCourseEnrollButtonClick(item.id)
         }
+        binding.courseName.setOnClickListener {
+            listener.onCourseTitleClick(item.id)
+        }
     }
 }

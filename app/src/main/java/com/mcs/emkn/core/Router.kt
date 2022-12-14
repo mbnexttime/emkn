@@ -1,5 +1,7 @@
 package com.mcs.emkn.core
 
+import android.os.Bundle
+
 interface Router {
     fun back()
 
@@ -16,4 +18,8 @@ interface Router {
     fun goToUserNavGraph()
 
     fun goToProfile()
+
+    fun goToCoursePage(bundle: Bundle)
+
+    fun goToCourseHomeworks()
 }
