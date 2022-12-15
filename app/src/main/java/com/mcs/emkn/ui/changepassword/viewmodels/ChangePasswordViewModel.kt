@@ -53,7 +53,7 @@ class ChangePasswordViewModel @Inject constructor(
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordCommits()
                             db.accountsDao()
-                                .putChangePasswordCommit(ChangePasswordCommit(response.body.changePasswordToken))
+                                .putChangePasswordCommit(ChangePasswordCommit(response.body.token.changePasswordToken))
                         }
                         _navEvents.emit(ChangePasswordNavEvent.ContinueChangePassword)
                     }
@@ -90,7 +90,11 @@ class ChangePasswordViewModel @Inject constructor(
                 when (val response =
                     api.accountsRevalidateChangePasswordCredentials(RevalidateCredentialsDto(attempt.randomToken))) {
                     is NetworkResponse.Success -> {
-                        val newAttempt = attempt.copy(createdAt = System.currentTimeMillis())
+                        val newAttempt = attempt.copy(
+                            createdAt = System.currentTimeMillis(),
+                            expiresInSeconds = response.body.tokenAndTimeDto.expiresIn.toLong(),
+                            randomToken = response.body.tokenAndTimeDto.randomToken,
+                        )
                         db.runInTransaction {
                             db.accountsDao().deleteChangePasswordAttempts()
                             db.accountsDao().putChangePasswordAttempt(newAttempt)

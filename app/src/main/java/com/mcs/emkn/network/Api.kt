@@ -33,7 +33,7 @@ interface Api {
     @POST("accounts/validate_change_password")
     suspend fun accountsValidateChangePassword(
         @Body request: ValidateChangePasswordRequestDto
-    ): NetworkResponse<TokenDto, ValidateChangePasswordErrorResponseDto>
+    ): NetworkResponse<ResponseWithTokenDto, ValidateChangePasswordErrorResponseDto>
 
     @POST("accounts/commit_change_password")
     suspend fun accountsCommitChangePassword(
@@ -48,7 +48,7 @@ interface Api {
     @POST("accounts/revalidate_change_password_credentials")
     suspend fun accountsRevalidateChangePasswordCredentials(
         @Body request: RevalidateCredentialsDto,
-    ): NetworkResponse<Unit, RevalidateRegistrationCredentialsErrorResponseDto>
+    ): NetworkResponse<ResponseWithTokenAndTimeDto, RevalidateRegistrationCredentialsErrorResponseDto>
 
     @POST("courses/periods")
     suspend fun coursesPeriods(@Body empty: EmptyRequest, @Header("Authorization") auth: String) : NetworkResponse<CoursesPeriodsResponseDto, Unit>
