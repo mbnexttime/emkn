@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import androidx.activity.addCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -70,6 +71,11 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
 
     @Inject
     lateinit var router: Router
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this) {}
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -190,4 +196,5 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
         super.onDestroyView()
         _binding = null
     }
+
 }
