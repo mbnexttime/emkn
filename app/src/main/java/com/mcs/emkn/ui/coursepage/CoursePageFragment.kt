@@ -38,22 +38,30 @@ class CoursePageFragment : Fragment(R.layout.fragment_course_page) {
         return binding.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setupRecyclerItems()
+    }
+
+    private fun setupRecyclerItems() {
+        arguments?.getParcelableArray("profiles")?.mapIndexed { id, parcel ->
+            val profile = parcel as Profile
+            CoursePageAvatarItem(id, profile.avatarUri.toString(), profile.firstName + "\n" + profile.secondName)
+        }?.let {
+            adapter.items += it
+        }
+
+        arguments?.getString("description")?.let {
+            CoursePageDescriptionItem(adapter.items.size, it)
+        }?.let {
+            adapter.items += it
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.title.text = arguments?.getString("title") ?: "..."
-        val avatars =  arguments?.getParcelableArray("profiles")?.mapIndexed { id, parcel ->
-            val profile = parcel as Profile
-            CoursePageAvatarItem(id, profile.avatarUri.toString(), profile.firstName + "\n" + profile.secondName)
-        }
-        avatars?.let {
-            adapter.items += it
-        }
-        val description = arguments?.getString("description")?.let {
-            CoursePageDescriptionItem(adapter.items.size, it)
-        }
-        description?.let {
-            adapter.items += it
-        }
+
         binding.coursePageRecycler.adapter = adapter
         binding.coursePageRecycler.addItemDecoration(
             VerticalSpaceDecorator(

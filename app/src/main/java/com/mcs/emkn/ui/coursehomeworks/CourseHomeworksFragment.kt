@@ -29,24 +29,24 @@ class CourseHomeworksFragment : Fragment(R.layout.fragment_course_homeworks) {
             CourseHomeworksSectionItem(1, "Открытые задания"),
             CourseHomeworksTaskItem(
                 2,
-                "Фурье",
-                "04 декабря",
-                "18:00",
-                CourseHomeworksTaskItem.HomeworkStatus.Checked(10, 10)
+                "Лабораторная работа №3\nРазмещения Дирихле",
+                "10 декабря 2022",
+                "23:59",
+                CourseHomeworksTaskItem.HomeworkStatus.NotSubmitted
             ),
             CourseHomeworksTaskItem(
                 3,
-                "Фурье",
-                "04 декабря",
-                "18:00",
-                CourseHomeworksTaskItem.HomeworkStatus.Checked(10, 10)
+                "Теоретическое задание № 2:\nВариационный вывод",
+                "01 октября 2022",
+                "23:59",
+                CourseHomeworksTaskItem.HomeworkStatus.NotChecked
             ),
             CourseHomeworksSectionItem(4, "Архив"),
             CourseHomeworksTaskItem(
                 5,
-                "Фурье",
-                "04 декабря",
-                "18:00",
+                "Практическое задание № 1:\nБайесовские рассуждения",
+                "23 сентября 2022",
+                "23:59",
                 CourseHomeworksTaskItem.HomeworkStatus.Checked(10, 10)
             )
         )
