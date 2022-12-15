@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.mcs.emkn.R
 import com.mcs.emkn.core.Router
 import com.mcs.emkn.core.rv.RecyclerAdapterWithDelegates
+import com.mcs.emkn.core.rv.RouterBundleKeys
 import com.mcs.emkn.core.rv.VerticalSpaceDecorator
 import com.mcs.emkn.databinding.FragmentCoursesBinding
 import com.mcs.emkn.ui.courses.viewmodels.CheckBoxesState
@@ -48,9 +49,10 @@ class CoursesFragment : Fragment(R.layout.fragment_courses) {
                                 .filterNotNull().toTypedArray()
                         val description = course.shortDescription
                         val bundle = bundleOf(
-                            "title" to title,
-                            "profiles" to courseProfiles,
-                            "description" to description
+                            RouterBundleKeys.courseId to courseId,
+                            RouterBundleKeys.title to title,
+                            RouterBundleKeys.courseProfiles to courseProfiles,
+                            RouterBundleKeys.description to description
                         )
                         router.goToCoursePage(bundle)
                     }

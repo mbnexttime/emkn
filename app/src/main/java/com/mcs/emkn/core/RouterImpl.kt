@@ -67,7 +67,7 @@ class RouterImpl @Inject constructor() : Router {
         navController?.navigate(R.id.action_coursesFragment_to_coursePageFragment, bundle)
     }
 
-    override fun goToCourseHomeworks() {
-        navController?.navigate(R.id.action_coursePageFragment_to_courseHomeworksFragment)
+    override fun goToCourseHomeworks(bundle: Bundle) {
+        navController?.navigate(R.id.action_coursePageFragment_to_courseHomeworksFragment, bundle)
     }
 }

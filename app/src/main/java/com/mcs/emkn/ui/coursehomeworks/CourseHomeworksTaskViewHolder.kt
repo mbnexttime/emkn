@@ -25,11 +25,11 @@ class CourseHomeworksTaskViewHolder(
             is CourseHomeworksTaskItem.HomeworkStatus.Checked -> {
                 "${item.status.score}/${item.status.maximum}".also { binding.status.text = it }
             }
-            CourseHomeworksTaskItem.HomeworkStatus.NotChecked -> {
-                binding.status.text = "не проверено"
+            is CourseHomeworksTaskItem.HomeworkStatus.NotChecked -> {
+                binding.status.text = item.status.text
             }
-            CourseHomeworksTaskItem.HomeworkStatus.NotSubmitted -> {
-                binding.status.text = "не сдано"
+            is CourseHomeworksTaskItem.HomeworkStatus.NotSubmitted -> {
+                binding.status.text = item.status.text
             }
         }
     }

@@ -4,10 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.mcs.emkn.database.entities.CheckBoxesStateEntity
-import com.mcs.emkn.database.entities.CourseEntity
-import com.mcs.emkn.database.entities.PeriodEntity
-import com.mcs.emkn.database.entities.ProfileEntity
+import com.mcs.emkn.database.entities.*
 
 
 @Dao
@@ -56,4 +53,10 @@ interface CoursesDao{
 
     @Query("DELETE FROM ${CheckBoxesStateEntity.CHECK_BOX_TABLE_NAME}")
     fun deleteCheckBoxState()
+
+    @Query("SELECT * FROM ${HomeworkEntity.HOMEWORKS_TABLE_NAME} WHERE courseId = :id")
+    fun getHomeworksByCourse(id: Int): List<HomeworkEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun putHomeworks(homeworks: List<HomeworkEntity>)
 }

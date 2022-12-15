@@ -82,4 +82,10 @@ interface Api {
         @Body request: UploadImageRequestDto,
         @Header("Authorization") auth: String,
     ): NetworkResponse<Unit, Unit>
+
+    @POST("courses/get_homeworks")
+    suspend fun getHomeworks(
+        @Body request: CoursesEnrollUnenrollRequestDto,
+        @Header("Authorization") auth: String
+    ): NetworkResponse<GetHomeworksResponseDto, GetHomeworksErrorResponseDto>
 }

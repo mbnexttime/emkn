@@ -15,7 +15,8 @@ import com.mcs.emkn.database.entities.*
         CourseEntity::class,
         PeriodEntity::class,
         ProfileEntity::class,
-        CheckBoxesStateEntity::class
+        CheckBoxesStateEntity::class,
+        HomeworkEntity::class
     ],
     version = 1
 )
