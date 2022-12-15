@@ -11,8 +11,8 @@ data class CourseHomeworksTaskItem(
     val status: HomeworkStatus
 ) : Item {
     sealed interface HomeworkStatus {
-        object NotSubmitted: HomeworkStatus
-        object NotChecked: HomeworkStatus
+        data class NotSubmitted(val text: String): HomeworkStatus
+        data class NotChecked(val text: String): HomeworkStatus
         data class Checked(val score: Int, val maximum: Int): HomeworkStatus
     }
 

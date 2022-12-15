@@ -21,5 +21,5 @@ interface Router {
 
     fun goToCoursePage(bundle: Bundle)
 
-    fun goToCourseHomeworks()
+    fun goToCourseHomeworks(bundle: Bundle)
 }
